@@ -22,8 +22,38 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: 'Rentverse',
-  description: 'Your rental platform',
+  title: 'RentVerse - Property Rental Platform',
+  description: 'Find your perfect rental property in Malaysia. Browse apartments, houses, condominiums and more.',
+  manifest: '/manifest.json',
+  themeColor: '#0d9488',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'RentVerse',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'RentVerse',
+    title: 'RentVerse - Property Rental Platform',
+    description: 'Find your perfect rental property in Malaysia',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'RentVerse - Property Rental Platform',
+    description: 'Find your perfect rental property in Malaysia',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
+  icons: {
+    icon: '/icon-192x192.png',
+    apple: '/icon-192x192.png',
+  },
 }
 
 export default function RootLayout({
@@ -33,6 +63,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={clsx([poly.className, manrope.className])}>
+    <head>
+      <link rel="manifest" href="/manifest.json" />
+      <meta name="theme-color" content="#0d9488" />
+      <link rel="apple-touch-icon" href="/icon-192x192.png" />
+    </head>
     <body>
       <AuthInitializer />
       <ToastProvider />

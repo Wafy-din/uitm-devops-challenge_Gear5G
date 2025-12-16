@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ArrowDownWideNarrow } from 'lucide-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -13,7 +13,7 @@ import ContentWrapper from '@/components/ContentWrapper'
 import ButtonSecondary from '@/components/ButtonSecondary'
 import ButtonMapViewSwitcher from '@/components/ButtonMapViewSwitcher'
 
-function ResultsPage() {
+function ResultsPageContent() {
   const searchParams = useSearchParams()
   const { properties, isLoading, loadProperties, mapData, pagination, changePage, searchFilters } = usePropertiesStore()
   const [isMapView, setIsMapView] = useState(false)
@@ -478,4 +478,19 @@ function ResultsPage() {
   )
 }
 
-export default ResultsPage
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <ContentWrapper searchBoxType="compact">
+        <div className="w-full h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading search results...</p>
+          </div>
+        </div>
+      </ContentWrapper>
+    }>
+      <ResultsPageContent />
+    </Suspense>
+  )
+}
