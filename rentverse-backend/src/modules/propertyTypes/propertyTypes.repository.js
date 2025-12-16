@@ -5,17 +5,22 @@ class PropertyTypesRepository {
     return await prisma.propertyType.findMany(options);
   }
 
-  async findById(id) {
-    return await prisma.propertyType.findUnique({
+  async findById(id, includeCount = false) {
+    const query = {
       where: { id },
-      include: {
+    };
+
+    if (includeCount) {
+      query.include = {
         _count: {
           select: {
             properties: true,
           },
         },
-      },
-    });
+      };
+    }
+
+    return await prisma.propertyType.findUnique(query);
   }
 
   async create(data) {

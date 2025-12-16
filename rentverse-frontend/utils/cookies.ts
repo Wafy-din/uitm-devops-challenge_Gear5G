@@ -11,7 +11,11 @@ export function setCookie(name: string, value: string, days: number = 7): void {
   const expires = new Date()
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
   
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;secure;samesite=strict`
+  // Only use secure flag in production (HTTPS)
+  const isProduction = window.location.protocol === 'https:'
+  const secureFlag = isProduction ? ';secure' : ''
+  
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/${secureFlag};samesite=lax`
 }
 
 /**

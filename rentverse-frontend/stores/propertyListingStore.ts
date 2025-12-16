@@ -180,6 +180,7 @@ const initialSteps: PropertyListingStep[] = [
 // Initial form data
 const initialData: PropertyListingData = {
   propertyType: '',
+  propertyTypeId: undefined, // Add propertyTypeId to initial data
   address: '',
   city: '',
   state: '',
@@ -222,10 +223,18 @@ export const usePropertyListingStore = create<PropertyListingStore>()(
       },
 
       updateData: (updates: Partial<PropertyListingData>) => {
-        set((state) => ({
-          data: { ...state.data, ...updates },
-          isDirty: true,
-        }))
+        console.log('[PropertyListingStore] updateData called with:', updates)
+        set((state) => {
+          const newData = { ...state.data, ...updates }
+          console.log('[PropertyListingStore] New data state:', {
+            propertyType: newData.propertyType,
+            propertyTypeId: newData.propertyTypeId
+          })
+          return {
+            data: newData,
+            isDirty: true,
+          }
+        })
       },
 
       nextStep: () => {
@@ -402,10 +411,18 @@ export const usePropertyListingStore = create<PropertyListingStore>()(
             return
           }
           
+          // Log current property data before mapping
+          console.log('[PropertyListingStore] Current property data before submit:', {
+            propertyType: data.propertyType,
+            propertyTypeId: data.propertyTypeId,
+            title: data.title,
+            city: data.city
+          })
+          
           // Map property data to upload format (now includes dynamic propertyTypeId)
           const uploadData = mapPropertyListingToUploadRequest(data)
           
-          console.log('Submitting property with propertyTypeId:', uploadData.propertyTypeId)
+          console.log('[PropertyListingStore] Submitting property with propertyTypeId:', uploadData.propertyTypeId)
           
           // Upload property to backend
           await uploadProperty(uploadData, token)

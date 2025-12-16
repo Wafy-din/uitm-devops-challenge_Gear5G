@@ -36,18 +36,19 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Google OAuth Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.BASE_URL}/api/auth/google/callback`,
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const email = profile.emails[0]?.value;
-        const name = profile.displayName;
-        const googleId = profile.id;
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: `${process.env.BASE_URL}/api/auth/google/callback`,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const email = profile.emails[0]?.value;
+          const name = profile.displayName;
+          const googleId = profile.id;
         const profilePicture = profile.photos[0]?.value || null;
 
         if (!email) {
@@ -152,10 +153,14 @@ passport.use(
     }
   )
 );
+} else {
+  console.warn('Google OAuth not configured - GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET missing');
+}
 
 // Facebook OAuth Strategy
-passport.use(
-  new FacebookStrategy(
+if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
+  passport.use(
+    new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_APP_ID,
       clientSecret: process.env.FACEBOOK_APP_SECRET,
@@ -251,11 +256,15 @@ passport.use(
     }
   )
 );
+} else {
+  console.warn('Facebook OAuth not configured - FACEBOOK_APP_ID or FACEBOOK_APP_SECRET missing');
+}
 
 // GitHub OAuth Strategy
-passport.use(
-  new GitHubStrategy(
-    {
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+  passport.use(
+    new GitHubStrategy(
+      {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: `${process.env.BASE_URL}/api/auth/github/callback`,
@@ -372,21 +381,25 @@ passport.use(
     }
   )
 );
+} else {
+  console.warn('GitHub OAuth not configured - GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET missing');
+}
 
 // Twitter OAuth Strategy
-passport.use(
-  new TwitterStrategy(
-    {
-      consumerKey: process.env.TWITTER_CONSUMER_KEY,
-      consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-      callbackURL: `${process.env.BASE_URL}/api/auth/twitter/callback`,
-      includeEmail: true,
-    },
-    async (token, tokenSecret, profile, done) => {
-      try {
-        const email = profile.emails?.[0]?.value;
-        const name = profile.displayName || profile.username;
-        const twitterId = profile.id;
+if (process.env.TWITTER_CONSUMER_KEY && process.env.TWITTER_CONSUMER_SECRET) {
+  passport.use(
+    new TwitterStrategy(
+      {
+        consumerKey: process.env.TWITTER_CONSUMER_KEY,
+        consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+        callbackURL: `${process.env.BASE_URL}/api/auth/twitter/callback`,
+        includeEmail: true,
+      },
+      async (token, tokenSecret, profile, done) => {
+        try {
+          const email = profile.emails?.[0]?.value;
+          const name = profile.displayName || profile.username;
+          const twitterId = profile.id;
 
         if (!email) {
           return done(new Error('No email found from Twitter profile'), null);
@@ -450,7 +463,12 @@ passport.use(
       }
     }
   )
-); // Apple Sign In handler (manual implementation since no official Passport strategy)
+);
+} else {
+  console.warn('Twitter OAuth not configured - TWITTER_CONSUMER_KEY or TWITTER_CONSUMER_SECRET missing');
+}
+
+// Apple Sign In handler (manual implementation since no official Passport strategy)
 const handleAppleSignIn = async (appleToken, userInfo = null) => {
   try {
     // Verify Apple token

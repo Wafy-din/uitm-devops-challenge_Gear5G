@@ -8,6 +8,12 @@ function AddListingStepOnePlace() {
   const { data, updateData, markStepCompleted } = usePropertyListingStore()
   const [selectedPropertyType, setSelectedPropertyType] = useState<string>(data.propertyType || '')
   const { propertyTypes, isLoading, error } = usePropertyTypes()
+  
+  // Debug logging
+  console.log('[AddListingStepOnePlace] Component mounted')
+  console.log('[AddListingStepOnePlace] propertyTypes:', propertyTypes)
+  console.log('[AddListingStepOnePlace] isLoading:', isLoading)
+  console.log('[AddListingStepOnePlace] error:', error)
 
   // Update store when selection changes
   useEffect(() => {
@@ -27,12 +33,24 @@ function AddListingStepOnePlace() {
 
   const handlePropertyTypeSelect = (propertyName: string) => {
     const selectedType = propertyTypes.find(type => type.name === propertyName)
+    console.log('[AddListingStepOnePlace] Selected property type:', {
+      name: propertyName,
+      id: selectedType?.id,
+      selectedType
+    })
+    
     setSelectedPropertyType(propertyName)
     if (selectedType) {
       updateData({ 
         propertyType: propertyName,
         propertyTypeId: selectedType.id 
       })
+      console.log('[AddListingStepOnePlace] Updated store with:', {
+        propertyType: propertyName,
+        propertyTypeId: selectedType.id
+      })
+    } else {
+      console.error('[AddListingStepOnePlace] No matching property type found for:', propertyName)
     }
   }
 

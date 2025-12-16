@@ -25,6 +25,7 @@ interface PropertiesActions {
   // Properties actions
   loadProperties: (filters?: SearchFilters) => Promise<void>
   searchProperties: (filters: SearchFilters) => Promise<void>
+  changePage: (page: number) => Promise<void>
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   addProperty: (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>
@@ -169,7 +170,6 @@ const usePropertiesStore = create<PropertiesStore>((set, get) => ({
     setError(null)
 
     try {
-      // Build query parameters
       const params = new URLSearchParams()
       
       if (filters?.page) params.append('page', filters.page.toString())
@@ -184,6 +184,9 @@ const usePropertiesStore = create<PropertiesStore>((set, get) => ({
       const queryString = params.toString()
       const url = queryString ? `/api/properties?${queryString}` : '/api/properties'
 
+      console.log('[PropertiesStore] Fetching properties from:', url)
+      console.log('[PropertiesStore] Filters:', filters)
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -192,29 +195,32 @@ const usePropertiesStore = create<PropertiesStore>((set, get) => ({
       })
 
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('[PropertiesStore] HTTP error:', response.status, errorText)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result: PropertiesResponse = await response.json()
 
-      console.log('Properties API response:', result)
-      console.log('Map data from API:', result.data?.maps)
+      console.log('[PropertiesStore] API response:', result)
 
       if (result.success) {
+        console.log('[PropertiesStore] Setting properties:', result.data.properties.length)
+        console.log('[PropertiesStore] Pagination:', result.data.pagination)
+        console.log('[PropertiesStore] Map data:', result.data.maps)
+        
         set({
           properties: result.data.properties,
           filteredProperties: result.data.properties,
           pagination: result.data.pagination,
-          mapData: result.data.maps || null, // Ensure we handle missing maps data
+          mapData: result.data.maps || null,
           searchFilters: filters || get().searchFilters,
         })
-        
-        console.log('Updated store with mapData:', result.data.maps)
       } else {
         setError('Failed to load properties')
       }
     } catch (error) {
-      console.error('Error loading properties:', error)
+      console.error('[PropertiesStore] Error loading properties:', error)
       setError('Failed to load properties. Please try again.')
     } finally {
       setLoading(false)
@@ -223,6 +229,11 @@ const usePropertiesStore = create<PropertiesStore>((set, get) => ({
 
   searchProperties: async (filters: SearchFilters) => {
     await get().loadProperties(filters)
+  },
+
+  changePage: async (page: number) => {
+    const { searchFilters } = get()
+    await get().loadProperties({ ...searchFilters, page })
   },
 
   addProperty: async (property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>) => {

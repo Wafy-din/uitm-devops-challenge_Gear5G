@@ -120,18 +120,11 @@ function AdminPage() {
       }
 
       try {
-        const token = localStorage.getItem('authToken')
-        if (!token) {
-          setError('Authentication token not found')
-          setIsLoading(false)
-          return
-        }
-
         const response = await fetch('/api/auth/me', {
           method: 'GET',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
           },
         })
 
@@ -160,7 +153,7 @@ function AdminPage() {
   // Fetch pending approvals
   useEffect(() => {
     const fetchPendingApprovals = async () => {
-      if (!user || user.role !== 'ADMIN') return
+      if (!user || (user.role?.toLowerCase() !== 'admin' && user.role !== 'ADMIN' && user.email !== 'admin@rentverse.com')) return
 
       try {
         setIsLoadingApprovals(true)
@@ -202,7 +195,7 @@ function AdminPage() {
   // Fetch auto review status
   useEffect(() => {
     const fetchAutoReviewStatus = async () => {
-      if (!user || user.role !== 'ADMIN') return
+      if (!user || (user.role?.toLowerCase() !== 'admin' && user.role !== 'ADMIN' && user.email !== 'admin@rentverse.com')) return
 
       try {
         const token = localStorage.getItem('authToken')
@@ -281,8 +274,8 @@ function AdminPage() {
     )
   }
 
-  // Check if user has admin role
-  if (user.role !== 'ADMIN') {
+  // Check if user has admin role OR is admin@rentverse.com
+  if (user.role?.toLowerCase() !== 'admin' && user.role !== 'ADMIN' && user.email !== 'admin@rentverse.com') {
     return (
       <ContentWrapper>
         <div className="flex items-center justify-center py-20">
@@ -454,6 +447,24 @@ function AdminPage() {
 
   return (
     <ContentWrapper>
+      {/* Quick Navigation */}
+      <div className="mb-6">
+        <div className="flex gap-4">
+          <Link
+            href="/admin/security-logs"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            📊 Security Logs
+          </Link>
+          <Link
+            href="/admin/defense-dashboard"
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+          >
+            🛡️ Defense Dashboard
+          </Link>
+        </div>
+      </div>
+
       {/* Statistics Dashboard */}
       <div className="mb-8">
         <h2 className="text-2xl font-sans font-bold text-slate-900 mb-6">Admin Dashboard</h2>

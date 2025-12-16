@@ -15,29 +15,54 @@ type GetAllPropertyTypesType = () => Array<PropertyType>
 
 const locations: Array<LocationType> = [
   {
-    icon: '🏛️',
-    name: 'George Town, Penang',
-    description: 'UNESCO World Heritage Site with rich culture',
-  },
-  {
     icon: '🏢',
     name: 'Kuala Lumpur',
     description: 'Malaysia\'s bustling capital city',
   },
   {
-    icon: '🌴',
-    name: 'Langkawi, Kedah',
-    description: 'Tropical island paradise',
+    icon: '🏛️',
+    name: 'Penang',
+    description: 'UNESCO World Heritage Site with rich culture',
   },
   {
-    icon: '🏖️',
-    name: 'Kota Kinabalu, Sabah',
-    description: 'Gateway to Borneo adventures',
+    icon: '🌺',
+    name: 'Johor',
+    description: 'Modern developments near Singapore',
+  },
+  {
+    icon: '🏢',
+    name: 'Selangor',
+    description: 'Most developed state in Malaysia',
+  },
+  {
+    icon: '🏔️',
+    name: 'Perak',
+    description: 'Limestone caves and heritage buildings',
+  },
+  {
+    icon: '🌴',
+    name: 'Kedah',
+    description: 'Rice bowl of Malaysia',
+  },
+  {
+    icon: '🏰',
+    name: 'Melaka',
+    description: 'Historic city with colonial architecture',
   },
   {
     icon: '🏞️',
-    name: 'Cameron Highlands, Pahang',
-    description: 'Cool climate and tea plantations',
+    name: 'Pahang',
+    description: 'Largest state with natural attractions',
+  },
+  {
+    icon: '🌊',
+    name: 'Sarawak',
+    description: 'Land of the Hornbills',
+  },
+  {
+    icon: '🏖️',
+    name: 'Sabah',
+    description: 'Gateway to Borneo adventures',
   },
   {
     icon: '🕌',
@@ -45,24 +70,29 @@ const locations: Array<LocationType> = [
     description: 'Malaysia\'s administrative capital',
   },
   {
-    icon: '🏰',
-    name: 'Malacca City, Melaka',
-    description: 'Historic city with colonial architecture',
-  },
-  {
     icon: '🌊',
-    name: 'Kuching, Sarawak',
-    description: 'Cat city with cultural diversity',
+    name: 'Terengganu',
+    description: 'Beautiful beaches and islands',
   },
   {
-    icon: '🏔️',
-    name: 'Ipoh, Perak',
-    description: 'Limestone caves and heritage buildings',
+    icon: '🏛️',
+    name: 'Kelantan',
+    description: 'Cradle of Malay culture',
   },
   {
-    icon: '🌺',
-    name: 'Johor Bahru, Johor',
-    description: 'Modern city near Singapore',
+    icon: '🌳',
+    name: 'Negeri Sembilan',
+    description: 'Minangkabau heritage',
+  },
+  {
+    icon: '🏝️',
+    name: 'Labuan',
+    description: 'Duty-free island',
+  },
+  {
+    icon: '🌾',
+    name: 'Perlis',
+    description: 'Smallest state in Malaysia',
   },
 ]
 

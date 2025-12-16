@@ -105,14 +105,26 @@ export async function uploadProperty(
       body: JSON.stringify(propertyData),
     })
 
+    console.log('Upload response status:', response.status)
+    console.log('Upload response statusText:', response.statusText)
+    console.log('Upload response headers:', Object.fromEntries(response.headers.entries()))
+
     if (!response.ok) {
       // Try to get the error details from the response
-      let errorMessage = `Upload failed with status ${response.status}`
+      let errorMessage = `Upload failed with status ${response.status} (${response.statusText})`
+      
+      // Clone response to read it multiple times
+      const responseClone = response.clone()
+      
       try {
         const errorData = await response.json()
-        console.error('Backend error response:', errorData)
+        console.error('Backend error response (JSON):', errorData)
         
-        if (errorData.message) {
+        // Check if errorData is empty object
+        if (Object.keys(errorData).length === 0) {
+          console.error('Backend returned empty error object - this indicates a server crash or unhandled error')
+          errorMessage = `Server error (${response.status}): Backend did not provide error details. Check backend logs.`
+        } else if (errorData.message) {
           errorMessage = errorData.message
         } else if (errorData.error) {
           errorMessage = errorData.error
@@ -121,20 +133,24 @@ export async function uploadProperty(
           errorMessage = `Validation failed: ${JSON.stringify(errorData.details)}`
         } else if (typeof errorData === 'string') {
           errorMessage = errorData
+        } else {
+          errorMessage = `Server error: ${JSON.stringify(errorData)}`
         }
       } catch (parseError) {
-        console.error('Could not parse error response:', parseError)
+        console.error('Could not parse error response as JSON:', parseError)
         // Try to get response as text
         try {
-          const errorText = await response.text()
+          const errorText = await responseClone.text()
           console.error('Error response text:', errorText)
           if (errorText) {
-            errorMessage = errorText
+            errorMessage = `Server error (${response.status}): ${errorText.substring(0, 200)}`
           }
-        } catch {
-          // If we can't parse the error response, use the default message
+        } catch (textError) {
+          console.error('Could not read error as text either:', textError)
         }
       }
+      
+      console.error('Final error message:', errorMessage)
       throw new Error(errorMessage)
     }
 
@@ -164,12 +180,23 @@ function generatePropertyCode(): string {
  * Convert property listing data to upload format
  */
 export function mapPropertyListingToUploadRequest(data: PropertyListingData): MinimalPropertyUploadRequest {
-  // Ensure we have a propertyTypeId - use fallback if not available
-  const propertyTypeId = data.propertyTypeId || getDefaultPropertyTypeId(data.propertyType)
+  // Log received data
+  console.log('[mapPropertyListingToUploadRequest] Received data:', {
+    propertyType: data.propertyType,
+    propertyTypeId: data.propertyTypeId,
+    hasPropertyTypeId: !!data.propertyTypeId
+  })
+  
+  // Ensure we have a propertyTypeId - throw error if not available
+  const propertyTypeId = data.propertyTypeId
   
   if (!propertyTypeId) {
-    console.warn('No propertyTypeId available, this may cause upload issues')
+    const errorMsg = `Missing propertyTypeId! propertyType="${data.propertyType}". Please select a property type first.`
+    console.error(errorMsg)
+    throw new Error(errorMsg)
   }
+  
+  console.log('[mapPropertyListingToUploadRequest] Using propertyTypeId:', propertyTypeId)
 
   // Validate and prepare images array
   const images = Array.isArray(data.images) ? data.images.filter(url => url && url.trim() !== '') : []

@@ -27,9 +27,23 @@ function ModalEmailCheck({ isModal = true }: Readonly<ModalEmailCheckProps>) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    console.log('[ModalEmailCheck] Starting email check for:', email)
+    
     const data = (await submitEmailCheck()) as { exists?: boolean } | undefined
+    
+    console.log('[ModalEmailCheck] Email check result:', data)
+    
+    if (!data) {
+      console.log('[ModalEmailCheck] No data returned from email check, aborting navigation')
+      return
+    }
+    
     const exists = Boolean(data?.exists)
-    router.push(exists ? '/auth/login' : '/auth/signup')
+    const targetRoute = exists ? '/auth/login' : '/auth/signup'
+    
+    console.log('[ModalEmailCheck] Navigating to:', targetRoute)
+    router.push(targetRoute)
   }
 
   const handleGoogleLogin = () => {

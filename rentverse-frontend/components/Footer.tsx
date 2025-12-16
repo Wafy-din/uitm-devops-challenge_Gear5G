@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Globe } from 'lucide-react'
 import { FaXTwitter } from 'react-icons/fa6'
 import { FaInstagram, FaFacebook } from 'react-icons/fa'
@@ -17,19 +18,19 @@ function Footer() {
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/about" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/contact" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/careers" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     Careers
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -41,14 +42,14 @@ function Footer() {
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/property/result" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     All Properties
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/#popular-locations" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     Popular Locations
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -60,19 +61,19 @@ function Footer() {
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/help" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     Help Center (FAQ)
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/terms" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     Terms & Conditions
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                  <Link href="/privacy" className="text-slate-600 hover:text-slate-900 transition-colors duration-200">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

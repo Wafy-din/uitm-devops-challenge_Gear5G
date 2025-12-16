@@ -8,7 +8,6 @@ import CardProperty from '@/components/CardProperty'
 import type { Property, PropertyTypeBackend } from '@/types/property'
 import { Plus } from 'lucide-react'
 import useAuthStore from '@/stores/authStore'
-import { createApiUrl } from '@/utils/apiConfig'
 
 // Backend property response interfaces
 interface BackendProperty {
@@ -171,10 +170,10 @@ function AllMyPropertiesPage() {
           return
         }
 
-        const response = await fetch(createApiUrl('properties/my-properties?page=1&limit=50'), {
+        const response = await fetch('/api/properties/my-properties?page=1&limit=50', {
           method: 'GET',
           headers: {
-            'accept': 'application/json',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
         })

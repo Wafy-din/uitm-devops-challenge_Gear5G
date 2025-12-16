@@ -5,6 +5,16 @@ const { body, validationResult } = require('express-validator');
 const { prisma } = require('../config/database');
 const { passport, handleAppleSignIn } = require('../config/passport');
 
+// Security imports (OWASP M5-M6)
+const { authLimiter, strictLimiter, otpLimiter, createAccountLimiter } = require('../middleware/rateLimit');
+const { blacklistToken } = require('../services/tokenBlacklist');
+const { securityLogger } = require('../middleware/apiLogger');
+const { auth } = require('../middleware/auth');
+
+// Smart Notification System imports (Module 3)
+const suspiciousActivityService = require('../services/suspiciousActivity.service');
+const securityAlertService = require('../services/securityAlert.service');
+
 const router = express.Router();
 
 // Initialize Passport
@@ -189,19 +199,16 @@ router.post(
         },
       });
 
-      // Generate JWT token
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-      );
 
+      // Don't auto-login - require user to go through login flow for MFA
+      // This ensures all users go through MFA verification after signup
       res.status(201).json({
         success: true,
-        message: 'User registered successfully',
+        message: 'Account created successfully! Please login to continue.',
         data: {
           user,
-          token,
+          // Note: No token returned - user must login to get one (and verify MFA if enabled)
+          requiresLogin: true,
         },
       });
     } catch (error) {
@@ -260,19 +267,127 @@ router.post(
       });
 
       if (!user || !user.isActive) {
+        securityLogger.logAuthFailure(req, !user ? 'User not found' : 'Account inactive');
         return res.status(401).json({
           success: false,
           message: 'Invalid credentials',
         });
       }
 
+      // Check if account is locked
+      const otpService = require('../services/otp.service');
+      const lockStatus = await otpService.checkAccountLock(user.id);
+
+      if (lockStatus.locked) {
+        const remainingMinutes = Math.ceil(
+          (lockStatus.lockedUntil - new Date()) / (1000 * 60)
+        );
+        securityLogger.logAuthFailure(req, `Account locked (${remainingMinutes} min remaining)`);
+        return res.status(423).json({
+          success: false,
+          message: `Account is temporarily locked. Please try again in ${remainingMinutes} minute(s).`,
+          lockedUntil: lockStatus.lockedUntil,
+        });
+      }
+
       // Check password
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
+        // Record failed attempt
+        const attemptResult = await otpService.recordFailedAttempt(user.id);
+
+        // Record failed login in history
+        await suspiciousActivityService.recordLoginAttempt({
+          userId: user.id,
+          ipAddress: req.ip,
+          userAgent: req.headers['user-agent'],
+          success: false,
+          failReason: 'Invalid password',
+        });
+
+        if (attemptResult.locked) {
+          securityLogger.logAuthFailure(req, 'Account locked after failed attempts');
+
+          // Send account locked alert
+          await securityAlertService.alertAccountLocked(user.id, req.ip);
+
+          return res.status(423).json({
+            success: false,
+            message: 'Too many failed attempts. Account is temporarily locked for 15 minutes.',
+          });
+        }
+
+        // Check for multiple failures and send alert
+        const { hasSuspiciousActivity, alerts } = await suspiciousActivityService.checkSuspiciousPatterns(user.id, req.ip);
+        if (hasSuspiciousActivity && alerts.some(a => a.type === 'MULTIPLE_FAILURES')) {
+          await securityAlertService.alertMultipleFailures(user.id, attemptResult.attempts, req.ip);
+        }
+
+        securityLogger.logAuthFailure(req, `Wrong password (${attemptResult.attemptsRemaining} attempts remaining)`);
         return res.status(401).json({
           success: false,
-          message: 'Invalid credentials',
+          message: `Invalid credentials. ${attemptResult.attemptsRemaining} attempt(s) remaining.`,
         });
+      }
+
+      // Check if MFA is enabled
+      if (user.mfaEnabled) {
+        // Generate OTP and create session token for MFA flow
+        const { otp, expiresAt } = await otpService.createOtp(user.id, 'LOGIN');
+
+        // Create a short-lived session token for MFA verification
+        const mfaSessionToken = jwt.sign(
+          { userId: user.id, type: 'mfa_pending' },
+          process.env.JWT_SECRET,
+          { expiresIn: '10m' }
+        );
+
+        // Send OTP via email
+        const emailService = require('../services/email.service');
+        await emailService.sendOtpEmail(user.email, otp, 5);
+        console.log(`[MFA] OTP sent to ${user.email}`);
+
+        // Remove password from response
+        // eslint-disable-next-line no-unused-vars
+        const { password: _, ...userWithoutPassword } = user;
+
+        return res.json({
+          success: true,
+          message: 'MFA verification required',
+          data: {
+            mfaRequired: true,
+            sessionToken: mfaSessionToken,
+            expiresAt,
+            user: {
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+            },
+          },
+        });
+      }
+
+      // Reset login attempts on successful login
+      await otpService.resetLoginAttempts(user.id);
+
+      // Record successful login in history
+      await suspiciousActivityService.recordLoginAttempt({
+        userId: user.id,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+        failReason: null,
+      });
+
+      // Check if this is a new device and send alert
+      const { isNewDevice, device } = await suspiciousActivityService.checkDevice(
+        user.id,
+        req.headers['user-agent'],
+        req.ip
+      );
+      if (isNewDevice && device) {
+        await securityAlertService.alertNewDevice(user.id, device, req.ip);
       }
 
       // Generate JWT token
@@ -282,9 +397,12 @@ router.post(
         { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
       );
 
-      // Remove password from response
+      // Remove password and sensitive fields from response
       // eslint-disable-next-line no-unused-vars
-      const { password: _, ...userWithoutPassword } = user;
+      const { password: _, mfaSecret: __, ...userWithoutPassword } = user;
+
+      // Log successful login
+      securityLogger.logAuthSuccess(req, user.id);
 
       res.json({
         success: true,
@@ -303,6 +421,446 @@ router.post(
     }
   }
 );
+
+/**
+ * @swagger
+ * /api/auth/mfa/verify:
+ *   post:
+ *     summary: Verify MFA OTP and complete login
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - sessionToken
+ *               - otp
+ *             properties:
+ *               sessionToken:
+ *                 type: string
+ *                 description: MFA session token from login
+ *               otp:
+ *                 type: string
+ *                 description: 6-digit OTP code
+ *     responses:
+ *       200:
+ *         description: MFA verification successful
+ *       400:
+ *         description: Invalid OTP
+ *       401:
+ *         description: Invalid session token
+ */
+router.post(
+  '/mfa/verify',
+  [
+    body('sessionToken').notEmpty().withMessage('Session token is required'),
+    body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array(),
+        });
+      }
+
+      const { sessionToken, otp } = req.body;
+      const otpService = require('../services/otp.service');
+
+      // Verify session token
+      let decoded;
+      try {
+        decoded = jwt.verify(sessionToken, process.env.JWT_SECRET);
+
+        if (decoded.type !== 'mfa_pending') {
+          return res.status(401).json({
+            success: false,
+            message: 'Invalid session token type',
+          });
+        }
+      } catch (err) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid or expired session token. Please login again.',
+        });
+      }
+
+      // Verify OTP
+      const verifyResult = await otpService.verifyOtp(decoded.userId, otp, 'LOGIN');
+
+      if (!verifyResult.success) {
+        securityLogger.logMfaEvent(req, 'VERIFY', false, decoded.userId);
+        return res.status(400).json({
+          success: false,
+          message: verifyResult.message,
+        });
+      }
+
+      // Reset login attempts on successful MFA
+      await otpService.resetLoginAttempts(decoded.userId);
+
+      // Get user data
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found',
+        });
+      }
+
+      // Generate full JWT token
+      const token = jwt.sign(
+        { userId: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      );
+
+      // Remove sensitive fields
+      // eslint-disable-next-line no-unused-vars
+      const { password: _, mfaSecret: __, ...userWithoutPassword } = user;
+
+      // Record successful login and check for new device
+      const deviceInfo = suspiciousActivityService.parseUserAgent(req.headers['user-agent']);
+      const deviceCheck = await suspiciousActivityService.checkDevice(user.id, req.headers['user-agent'], req.ip);
+
+      // Record login in history
+      await suspiciousActivityService.recordLoginAttempt({
+        userId: user.id,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+
+      // Send new device alert if applicable
+      if (deviceCheck.isNew) {
+        await securityAlertService.alertNewDevice(user.id, {
+          ...deviceInfo,
+          ipAddress: req.ip,
+        });
+      }
+
+      // Log successful MFA verification
+      securityLogger.logMfaEvent(req, 'VERIFY', true, user.id);
+      securityLogger.logAuthSuccess(req, user.id);
+
+      res.json({
+        success: true,
+        message: 'MFA verification successful',
+        data: {
+          user: userWithoutPassword,
+          token,
+        },
+      });
+    } catch (error) {
+      console.error('MFA verify error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+      });
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /api/auth/mfa/enable:
+ *   post:
+ *     summary: Enable MFA for authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: MFA enabled successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/mfa/enable', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'No token provided',
+      });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token',
+      });
+    }
+
+    const otpService = require('../services/otp.service');
+    await otpService.enableMfa(decoded.userId);
+
+    res.json({
+      success: true,
+      message: 'MFA has been enabled for your account. You will need to enter an OTP code on your next login.',
+    });
+  } catch (error) {
+    console.error('MFA enable error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/auth/mfa/disable:
+ *   post:
+ *     summary: Disable MFA for authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 description: Current password for verification
+ *     responses:
+ *       200:
+ *         description: MFA disabled successfully
+ *       400:
+ *         description: Invalid password
+ *       401:
+ *         description: Unauthorized
+ */
+router.post(
+  '/mfa/disable',
+  [body('password').notEmpty().withMessage('Password is required')],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array(),
+        });
+      }
+
+      const token = req.headers.authorization?.replace('Bearer ', '');
+
+      if (!token) {
+        return res.status(401).json({
+          success: false,
+          message: 'No token provided',
+        });
+      }
+
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid token',
+        });
+      }
+
+      // Verify password before disabling MFA
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found',
+        });
+      }
+
+      const { password } = req.body;
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid password',
+        });
+      }
+
+      const otpService = require('../services/otp.service');
+      await otpService.disableMfa(decoded.userId);
+
+      res.json({
+        success: true,
+        message: 'MFA has been disabled for your account.',
+      });
+    } catch (error) {
+      console.error('MFA disable error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+      });
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /api/auth/mfa/resend:
+ *   post:
+ *     summary: Resend MFA OTP code
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - sessionToken
+ *             properties:
+ *               sessionToken:
+ *                 type: string
+ *                 description: MFA session token from login
+ *     responses:
+ *       200:
+ *         description: OTP resent successfully
+ *       401:
+ *         description: Invalid session token
+ */
+router.post(
+  '/mfa/resend',
+  [body('sessionToken').notEmpty().withMessage('Session token is required')],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array(),
+        });
+      }
+
+      const { sessionToken } = req.body;
+      const otpService = require('../services/otp.service');
+
+      // Verify session token
+      let decoded;
+      try {
+        decoded = jwt.verify(sessionToken, process.env.JWT_SECRET);
+
+        if (decoded.type !== 'mfa_pending') {
+          return res.status(401).json({
+            success: false,
+            message: 'Invalid session token type',
+          });
+        }
+      } catch (err) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid or expired session token. Please login again.',
+        });
+      }
+
+      // Get user email for logging
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: { email: true },
+      });
+
+      // Generate new OTP
+      const { otp, expiresAt } = await otpService.createOtp(decoded.userId, 'LOGIN');
+
+      // Send OTP via email
+      const emailService = require('../services/email.service');
+      if (user?.email) {
+        await emailService.sendOtpEmail(user.email, otp, 5);
+        console.log(`[MFA] Resent OTP to ${user.email}`);
+      }
+
+      res.json({
+        success: true,
+        message: 'A new OTP has been sent to your email.',
+        data: {
+          expiresAt,
+        },
+      });
+    } catch (error) {
+      console.error('MFA resend error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+      });
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout and invalidate token
+ *     description: Logs out the user and blacklists the current JWT token
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully logged out
+ *       401:
+ *         description: No token provided or invalid token
+ */
+router.post('/logout', auth, async (req, res) => {
+  try {
+    const token = req.token;
+
+    if (token) {
+      // Decode token to get expiration time
+      const decoded = jwt.decode(token);
+      const expiresAt = decoded?.exp ? decoded.exp * 1000 : Date.now() + (7 * 24 * 60 * 60 * 1000);
+
+      // Blacklist the token
+      blacklistToken(token, expiresAt);
+
+      // Log the logout event
+      securityLogger.logTokenBlacklisted(req, 'User logout');
+    }
+
+    // Update last login timestamp  
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
+    res.json({
+      success: true,
+      message: 'Logged out successfully. Token has been invalidated.',
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error during logout',
+    });
+  }
+});
 
 /**
  * @swagger
@@ -989,5 +1547,128 @@ router.post('/oauth/unlink', async (req, res) => {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/auth/change-password:
+ *   post:
+ *     summary: Change user password
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 description: Current password
+ *               newPassword:
+ *                 type: string
+ *                 minLength: 6
+ *                 description: New password (minimum 6 characters)
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Validation error or incorrect current password
+ *       401:
+ *         description: Unauthorized
+ */
+router.post(
+  '/change-password',
+  [
+    body('currentPassword').notEmpty().withMessage('Current password is required'),
+    body('newPassword')
+      .isLength({ min: 6 })
+      .withMessage('New password must be at least 6 characters'),
+  ],
+  async (req, res) => {
+    try {
+      // Validate request
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: errors.array(),
+        });
+      }
+
+      // Get token from header
+      const token = req.headers.authorization?.replace('Bearer ', '');
+      if (!token) {
+        return res.status(401).json({
+          success: false,
+          message: 'No token provided',
+        });
+      }
+
+      // Verify token
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid token',
+        });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+
+      // Find user with password
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+      });
+
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'User not found',
+        });
+      }
+
+      // Verify current password
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password is incorrect',
+        });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      // Update password in database
+      await prisma.user.update({
+        where: { id: decoded.userId },
+        data: { password: hashedPassword },
+      });
+
+      // Send password changed notification
+      await securityAlertService.alertPasswordChanged(decoded.userId, req.ip);
+      securityLogger.logPasswordChange(req, decoded.userId);
+
+      res.json({
+        success: true,
+        message: 'Password changed successfully',
+      });
+    } catch (error) {
+      console.error('Change password error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+      });
+    }
+  }
+);
 
 module.exports = router;

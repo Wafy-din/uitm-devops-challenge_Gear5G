@@ -2,12 +2,28 @@ import { LocationBaseType } from '@/types/location'
 
 type getPopularLocations = () => Array<LocationBaseType>
 
+// City name mapping untuk search compatibility
+// Maps display name → { city, state } for better search results
+export const citySearchMapping: Record<string, { city: string; state?: string }> = {
+  'Kuala Lumpur': { city: 'Kuala Lumpur', state: 'Kuala Lumpur' },
+  'Petaling Jaya': { city: 'Petaling Jaya', state: 'Selangor' }, 
+  'Subang Jaya': { city: 'Subang Jaya', state: 'Selangor' },
+  'Penang Island': { city: 'Penang', state: 'Penang' },
+  'Johor Bahru': { city: 'Johor Bahru', state: 'Johor' },
+  'Shah Alam': { city: 'Shah Alam', state: 'Selangor' },
+  'Putrajaya': { city: 'Putrajaya', state: 'Putrajaya' },
+  'Georgetown, Penang': { city: 'George Town', state: 'Penang' },
+  'Butterworth, Penang': { city: 'Butterworth', state: 'Penang' },
+  'Bayan Lepas, Penang': { city: 'Bayan Lepas', state: 'Penang' },
+  'Bukit Mertajam, Penang': { city: 'Bukit Mertajam', state: 'Penang' },
+}
+
 const popularLocations: Array<LocationBaseType> = [
   {
-    name: 'Kuala Lumpur',
+    name: 'Putrajaya',
     imageUrl: 'https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758027181/rentverse-locations/kuala-lumpur_zbmm3x.png',
-    latitude: 3.139,
-    longitude: 101.6869,
+    latitude: 2.9264,
+    longitude: 101.6964,
   },
   {
     name: 'Petaling Jaya',

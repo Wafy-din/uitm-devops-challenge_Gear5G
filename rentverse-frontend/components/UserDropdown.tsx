@@ -88,6 +88,9 @@ function UserDropdown({ isOpen, onClose, className }: Readonly<UserDropdownProps
 
   const fullName = getFullName()
   const initials = getInitials(user?.firstName || '', user?.lastName || '')
+  
+  // Debug: Log user role
+  console.log('User role:', user?.role, 'Type:', typeof user?.role)
 
   return (
     <div
@@ -176,27 +179,33 @@ function UserDropdown({ isOpen, onClose, className }: Readonly<UserDropdownProps
           <span className="font-medium">My listings</span>
         </Link>
 
-        {/* Admin Portal - Only show for admin users */}
-        {user?.role === 'ADMIN' && (
-          <>
-            {/* Separator */}
-            <div className="border-t border-slate-100 my-2"></div>
+        {/* Admin Portal - Show for admin users OR if email is admin@rentverse.com */}
+        {(() => {
+          const isAdmin = user?.role?.toLowerCase() === 'admin' || 
+                         user?.role === 'ADMIN' ||
+                         user?.email === 'admin@rentverse.com'
+          console.log('Is Admin Check:', { role: user?.role, email: user?.email, isAdmin })
+          return isAdmin ? (
+            <>
+              {/* Separator */}
+              <div className="border-t border-slate-100 my-2"></div>
 
-            {/* Admin Mode */}
-            <div className="px-4 py-2">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Admin Portal</p>
-            </div>
-            
-            <Link
-              href="/admin"
-              onClick={onClose}
-              className="flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors duration-200"
-            >
-              <Shield size={18} className="mr-3 text-slate-400" />
-              <span className="font-medium">Admin Dashboard</span>
-            </Link>
-          </>
-        )}
+              {/* Admin Mode */}
+              <div className="px-4 py-2">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Admin Portal</p>
+              </div>
+              
+              <Link
+                href="/admin"
+                onClick={onClose}
+                className="flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors duration-200"
+              >
+                <Shield size={18} className="mr-3 text-slate-400" />
+                <span className="font-medium">Admin Dashboard</span>
+              </Link>
+            </>
+          ) : null
+        })()}
 
         {/* Separator */}
         <div className="border-t border-slate-100 my-2"></div>

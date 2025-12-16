@@ -50,13 +50,18 @@ export const usePropertyTypes = () => {
             .filter((type: PropertyTypeDetail) => type.isActive !== false) // Only include active types
             .map(transformPropertyType)
           
-          setPropertyTypes(transformedTypes)
           console.log('✅ Successfully loaded property types:', transformedTypes.length)
+          console.log('Property types from API:', transformedTypes.map(t => ({
+            name: t.name,
+            id: t.id,
+            code: t.code
+          })))
+          setPropertyTypes(transformedTypes)
         } else {
           throw new Error('Failed to fetch property types - invalid response format')
         }
       } catch (err) {
-        console.error('Error fetching property types:', err)
+        console.error('❌ Error fetching property types:', err)
         let errorMessage = 'Unknown error'
         
         if (err instanceof Error) {
@@ -78,17 +83,11 @@ export const usePropertyTypes = () => {
         
         setError(errorMessage)
         
-        // Fallback to static data on error
-        console.log('🏠 Using fallback property types due to API error')
-        setPropertyTypes([
-          { icon: '�', name: 'Apartment', description: 'High-rise residential unit in apartment building', id: 'fallback-1', code: 'APARTMENT' },
-          { icon: '�️', name: 'Condominium', description: 'Luxury residential unit with premium facilities and amenities', id: 'fallback-2', code: 'CONDOMINIUM' },
-          { icon: '�', name: 'House', description: 'Standalone landed residential property', id: 'fallback-3', code: 'HOUSE' },
-          { icon: '�', name: 'Penthouse', description: 'Luxury apartment on the top floor with premium amenities', id: 'fallback-4', code: 'PENTHOUSE' },
-          { icon: '�', name: 'Studio', description: 'Open-concept single room residential unit', id: 'fallback-5', code: 'STUDIO' },
-          { icon: '�️', name: 'Townhouse', description: 'Multi-level landed property in planned development', id: 'fallback-6', code: 'TOWNHOUSE' },
-          { icon: '�', name: 'Villa', description: 'Luxurious single-family home with extensive grounds', id: 'fallback-7', code: 'VILLA' },
-        ])
+        // DO NOT use fallback - this will cause FK constraint errors
+        // Instead, keep propertyTypes empty and show error to user
+        console.error('⚠️  Cannot load property types from API - property listing will not work')
+        console.error('⚠️  Please ensure backend is running and property types are seeded')
+        setPropertyTypes([])
       } finally {
         setIsLoading(false)
       }

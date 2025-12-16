@@ -37,6 +37,8 @@ export async function POST(request: NextRequest) {
       const contentType = response.headers.get('content-type')
       if (contentType?.includes('application/json')) {
         const data = await response.json()
+        console.log('[LOGIN API] Backend response:', JSON.stringify(data, null, 2))
+        console.log('[LOGIN API] Token value:', data?.data?.token)
         return NextResponse.json(data, { status: response.status })
       } else {
         // If backend doesn't return JSON, create a generic error response

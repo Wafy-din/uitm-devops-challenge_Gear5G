@@ -178,8 +178,13 @@ class FileUploadService {
         streamifier.createReadStream(file.buffer).pipe(uploadStream);
       });
     } catch (error) {
-      console.error('File upload error:', error);
-      throw error;
+      console.error('File upload error:', {
+        message: error.message,
+        fileName: file?.originalname,
+        fileSize: file?.size,
+        stack: error.stack
+      });
+      throw new Error(`File upload failed for ${file?.originalname}: ${error.message}`);
     }
   }
 
@@ -192,8 +197,12 @@ class FileUploadService {
       const results = await Promise.all(uploadPromises);
       return results;
     } catch (error) {
-      console.error('Multiple file upload error:', error);
-      throw error;
+      console.error('Multiple file upload error:', {
+        message: error.message,
+        filesCount: files?.length,
+        stack: error.stack
+      });
+      throw new Error(`Multiple file upload failed: ${error.message}`);
     }
   }
 
@@ -214,8 +223,13 @@ class FileUploadService {
         throw new Error(`Delete failed: ${result.result}`);
       }
     } catch (error) {
-      console.error('File delete error:', error);
-      throw error;
+      console.error('File delete error:', {
+        message: error.message,
+        publicId: publicId,
+        resourceType: resourceType,
+        stack: error.stack
+      });
+      throw new Error(`File deletion failed for ${publicId}: ${error.message}`);
     }
   }
 

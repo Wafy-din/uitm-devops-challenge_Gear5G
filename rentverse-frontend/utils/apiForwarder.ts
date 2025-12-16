@@ -1,6 +1,6 @@
 // API forwarding utility for Next.js API routes
 
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
 
 export interface ForwardRequestOptions extends RequestInit {
   timeout?: number
@@ -130,10 +130,20 @@ export async function propertiesApiForwarder(
     const queryString = searchParams.toString()
     const fullEndpoint = queryString ? `${endpoint}?${queryString}` : endpoint
 
-    // For POST/PUT/PATCH requests, include the body
     const body = ['POST', 'PUT', 'PATCH'].includes(request.method) 
       ? await request.text() 
       : undefined
+
+    console.log('[Properties API Forwarder]', {
+      method: request.method,
+      endpoint: fullEndpoint,
+      hasBody: !!body,
+      bodyLength: body?.length,
+    })
+
+    if (body && request.method === 'POST') {
+      console.log('[Properties API Forwarder] POST body:', body.substring(0, 500))
+    }
 
     const response = await forwardRequest(fullEndpoint, {
       method: request.method,
@@ -144,29 +154,35 @@ export async function propertiesApiForwarder(
         })
       },
       body,
+      timeout: 60000,
+      retries: 2,
     })
 
-    // Handle non-JSON responses
+    console.log('[Properties API Forwarder] Response status:', response.status)
+
     const contentType = response.headers.get('Content-Type') || ''
     if (!contentType.includes('application/json')) {
-      return new Response(await response.text(), {
+      const textResponse = await response.text()
+      console.log('[Properties API Forwarder] Non-JSON response:', textResponse.substring(0, 200))
+      return new Response(textResponse, {
         status: response.status,
         headers: response.headers,
       })
     }
 
-    // Return the JSON response
     const data = await response.json()
+    console.log('[Properties API Forwarder] JSON response:', JSON.stringify(data).substring(0, 200))
+    
     return Response.json(data, {
       status: response.status,
     })
 
   } catch (error) {
-    console.error('Properties API forwarding error:', error)
+    console.error('[Properties API Forwarder] Error:', error)
     
     return Response.json(
       createErrorResponse(
-        'Failed to fetch properties',
+        'Failed to forward properties request',
         error instanceof Error ? error : undefined,
         500
       ),

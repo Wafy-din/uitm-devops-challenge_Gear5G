@@ -21,7 +21,10 @@ interface MapViewerProps {
   }>
   onMapLoad?: (map: maptilersdk.Map) => void
   onMapClick?: (coordinates: { lng: number; lat: number }) => void
+  onDragEnd?: (coordinates: { lng: number; lat: number }) => void
+  onMoveEnd?: (coordinates: { lng: number; lat: number }) => void
   interactive?: boolean
+  draggable?: boolean
 }
 
 const MapViewer = memo(function MapViewer({
@@ -34,7 +37,10 @@ const MapViewer = memo(function MapViewer({
                                             markers = [],
                                             onMapLoad,
                                             onMapClick,
+                                            onDragEnd,
+                                            onMoveEnd,
                                             interactive = true,
+                                            draggable = true,
                                           }: MapViewerProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maptilersdk.Map | null>(null)
@@ -44,7 +50,7 @@ const MapViewer = memo(function MapViewer({
   // Initialize API key once
   useEffect(() => {
     if (!maptilersdk.config.apiKey) {
-      maptilersdk.config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API || ''
+      maptilersdk.config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || ''
     }
   }, [])
 
@@ -94,6 +100,10 @@ const MapViewer = memo(function MapViewer({
         center: [center.lng, center.lat],
         zoom: zoom,
         interactive: interactive,
+        dragPan: draggable,
+        scrollZoom: interactive,
+        touchZoomRotate: interactive,
+        doubleClickZoom: interactive,
       })
 
       // Handle map load event
@@ -121,6 +131,32 @@ const MapViewer = memo(function MapViewer({
           })
         })
       }
+
+      // Handle drag end event
+      if (onDragEnd) {
+        map.current.on('dragend', () => {
+          const mapCenter = map.current?.getCenter()
+          if (mapCenter) {
+            onDragEnd({
+              lng: mapCenter.lng,
+              lat: mapCenter.lat,
+            })
+          }
+        })
+      }
+
+      // Handle move end event
+      if (onMoveEnd) {
+        map.current.on('moveend', () => {
+          const mapCenter = map.current?.getCenter()
+          if (mapCenter) {
+            onMoveEnd({
+              lng: mapCenter.lng,
+              lat: mapCenter.lat,
+            })
+          }
+        })
+      }
     } catch (error) {
       console.error('Error initializing map:', error)
     }
@@ -133,7 +169,8 @@ const MapViewer = memo(function MapViewer({
         isMapLoaded.current = false
       }
     }
-  }, [style, center.lng, center.lat, zoom, interactive, onMapLoad, onMapClick, clearMarkers, markers, addMarkers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Update map center and zoom when props change
   useEffect(() => {

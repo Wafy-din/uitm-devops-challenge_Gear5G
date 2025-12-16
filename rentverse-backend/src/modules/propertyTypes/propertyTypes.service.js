@@ -26,8 +26,8 @@ class PropertyTypesService {
     };
   }
 
-  async getById(id) {
-    return await propertyTypesRepository.findById(id);
+  async getById(id, includeCount = true) {
+    return await propertyTypesRepository.findById(id, includeCount);
   }
 
   async create(data) {
@@ -35,7 +35,7 @@ class PropertyTypesService {
   }
 
   async update(id, data) {
-    const propertyType = await propertyTypesRepository.findById(id);
+    const propertyType = await propertyTypesRepository.findById(id, false);
     if (!propertyType) {
       return null;
     }
@@ -44,7 +44,7 @@ class PropertyTypesService {
   }
 
   async delete(id) {
-    const propertyType = await propertyTypesRepository.findById(id);
+    const propertyType = await propertyTypesRepository.findById(id, false);
     if (!propertyType) {
       return false;
     }

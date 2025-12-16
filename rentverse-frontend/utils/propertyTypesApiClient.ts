@@ -1,6 +1,5 @@
 import type { PropertyTypesResponse } from '@/types/property'
-
-const BASE_URL = 'https://rentverse-be.jokoyuliyanto.my.id/api'
+import { getApiUrl } from '@/utils/apiConfig'
 
 export class PropertyTypesApiClient {
   private static getAuthToken(): string | null {
@@ -10,6 +9,7 @@ export class PropertyTypesApiClient {
 
   static async getPropertyTypes(): Promise<PropertyTypesResponse> {
     const token = this.getAuthToken()
+    const BASE_URL = getApiUrl() // Use centralized API config
     
     const headers: Record<string, string> = {
       'accept': 'application/json',

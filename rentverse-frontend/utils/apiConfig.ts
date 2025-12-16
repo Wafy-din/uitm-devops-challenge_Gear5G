@@ -17,7 +17,7 @@ export const getApiBaseUrl = (): string => {
  * Falls back to production URL if not set
  */
 export const getAiServiceBaseUrl = (): string => {
-  const baseUrl = process.env.NEXT_PUBLIC_AI_SERVICE_URL || 'http://rentverse-ai.jokoyuliyanto.my.id'
+  const baseUrl = process.env.NEXT_PUBLIC_AI_SERVICE_URL || 'https://rentverse-ai.jokoyuliyanto.my.id'
   
   // Remove trailing slash if present
   return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl

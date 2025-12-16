@@ -125,6 +125,19 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       const result = await response.json()
 
       if (response.ok && result.success) {
+        // Check if MFA is required
+        if (result.data.mfaRequired) {
+          // Store session token for MFA verification
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('mfaSessionToken', result.data.sessionToken)
+            localStorage.setItem('mfaPendingEmail', email)
+          }
+          
+          // Redirect to MFA verification page
+          window.location.href = '/auth/mfa-verify'
+          return
+        }
+
         // Store user data and token
         const backendUser = result.data.user
         
@@ -257,8 +270,11 @@ const useAuthStore = create<AuthStore>((set, get) => ({
   submitEmailCheck: async () => {
     const { email, validateEmail, setLoading, setError } = get()
 
+    console.log('[AuthStore] submitEmailCheck called with email:', email)
+
     if (!validateEmail(email)) {
       setError('Please enter a valid email address')
+      console.log('[AuthStore] Email validation failed')
       return null
     }
 
@@ -266,6 +282,8 @@ const useAuthStore = create<AuthStore>((set, get) => ({
     setError(null)
 
     try {
+      console.log('[AuthStore] Sending POST request to /api/auth/check-email')
+      
       const response = await fetch('/api/auth/check-email', {
         method: 'POST',
         headers: {
@@ -274,16 +292,22 @@ const useAuthStore = create<AuthStore>((set, get) => ({
         body: JSON.stringify({ email }),
       })
 
+      console.log('[AuthStore] Response status:', response.status)
+
       const result = await response.json()
+      
+      console.log('[AuthStore] Response data:', result)
 
       if (response.ok && result.success) {
+        console.log('[AuthStore] Email check successful, returning data:', result.data)
         return result.data
       } else {
+        console.log('[AuthStore] Email check failed:', result.message)
         setError(result.message || 'Email check failed. Please try again.')
         return null
       }
     } catch (error) {
-      console.error('Email check error:', error)
+      console.error('[AuthStore] Email check error:', error)
       setError('Email check failed. Please try again.')
       return null
     } finally {
@@ -343,7 +367,6 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Error initializing auth:', error)
-      // Clear corrupted data
       localStorage.removeItem('authToken')
       localStorage.removeItem('authUser')
       deleteCookie('authToken')
