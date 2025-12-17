@@ -4,6 +4,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import clsx from 'clsx'
+import { Capacitor } from '@capacitor/core'
 import InputEmail from './InputEmail'
 import ButtonFilled from './ButtonFilled'
 import useAuthStore from '@/stores/authStore'
@@ -27,28 +28,30 @@ function ModalEmailCheck({ isModal = true }: Readonly<ModalEmailCheckProps>) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     console.log('[ModalEmailCheck] Starting email check for:', email)
-    
+
     const data = (await submitEmailCheck()) as { exists?: boolean } | undefined
-    
+
     console.log('[ModalEmailCheck] Email check result:', data)
-    
+
     if (!data) {
       console.log('[ModalEmailCheck] No data returned from email check, aborting navigation')
       return
     }
-    
+
     const exists = Boolean(data?.exists)
     const targetRoute = exists ? '/auth/login' : '/auth/signup'
-    
+
     console.log('[ModalEmailCheck] Navigating to:', targetRoute)
     router.push(targetRoute)
   }
 
   const handleGoogleLogin = () => {
+    const isMobile = Capacitor.isNativePlatform()
+
     // Redirect to Google OAuth endpoint
-    window.location.href = '/api/auth/google'
+    window.location.href = `/api/auth/google${isMobile ? '?platform=mobile' : ''}`
   }
 
   const containerContent = (
