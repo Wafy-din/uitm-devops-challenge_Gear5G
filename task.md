@@ -1,7 +1,13 @@
-# Mobile & Backend Setup Tasks
+# Mobile App Setup & Configuration
 
-- [x] Update Backend Vercel URL in `capacitor.config.ts` <!-- id: 0 -->
-- [x] Create build script `build_apk.bat` <!-- id: 1 -->
-- [x] Create `MOBILE_BUILD_GUIDE.md` <!-- id: 2 -->
-- [/] Verify APK creation and help user locate it <!-- id: 3 -->
-- [ ] User installs and verifies APK on device <!-- id: 4 -->
+- [x] Initial Capacitor Config Setup <!-- id: 0 -->
+- [x] Create Build Scripts & Guide <!-- id: 1 -->
+- [x] **Fix Vercel Production URL** <!-- id: 2 -->
+    - [x] Verify production domain <!-- id: 3 -->
+    - [x] Update `capacitor.config.ts` <!-- id: 4 -->
+    - [x] Update `rentverse-backend/src/routes/auth.js` <!-- id: 7 -->
+- [x] **Fix Homepage UI** <!-- id: 8 -->
+    - [x] Fix Trending dropdown z-index overlap <!-- id: 9 -->
+    - [x] Fix Stats section blocking dropdown <!-- id: 10 -->
+- [ ] Rebuild APK with new URL <!-- id: 5 -->
+- [ ] Verify PDF download functionality <!-- id: 6 -->

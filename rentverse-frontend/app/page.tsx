@@ -34,7 +34,7 @@ export default function Home() {
           </div>
 
           {/* Hero Content */}
-          <div className="relative z-10 text-center max-w-5xl mx-auto space-y-6">
+          <div className="relative z-30 text-center max-w-5xl mx-auto space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-sm font-semibold shadow-sm animate-fade-in-up">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
@@ -53,7 +53,7 @@ export default function Home() {
               The future of renting is transparent, secure, and purely digital.
             </p>
 
-            <div className="animate-fade-in-up delay-300 w-full max-w-4xl mx-auto px-4 lg:px-0">
+            <div className="animate-fade-in-up delay-300 w-full max-w-4xl mx-auto px-4 lg:px-0 relative z-20">
               <SearchBoxProperty className="transform transition-transform hover:scale-[1.01]" />
             </div>
 

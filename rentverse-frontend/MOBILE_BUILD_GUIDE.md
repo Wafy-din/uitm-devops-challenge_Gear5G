@@ -2,7 +2,7 @@
 
 ## Configuration Update
 The `capacitor.config.ts` has been updated to point to your deployed Vercel frontend:
-- **URL**: `https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app`
+- **URL**: `https://gear5g-rentverse.vercel.app`
 
 ## Building the APK
 I have created a batch script `build_apk.bat` in the `rentverse-frontend` directory to automate the process.
