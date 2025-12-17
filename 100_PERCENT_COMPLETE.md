@@ -19,6 +19,7 @@
 
 ### 🖼️ Threat Intelligence Output
 ![Threat Intelligence Output](github/assets/threatAI.png)
+![Threat Intelligence Output](github/assets/threatAI1.png)
 > *AI-detected threat patterns categorized by confidence score.*
 
 ---
