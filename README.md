@@ -75,6 +75,18 @@ cd rentverse-ai-service
 python app.py
 ```
 
+### 🧪 Test Admin Credentials
+
+**Note:** Multi-Factor Authentication (MFA) has been specifically disabled for this account to streamline the testing of admin capabilities. Accounts without MFA will bypass the Welcome Popup Modal.
+
+| Credential | Value |
+| :--- | :--- |
+| **📧 Email** | `admin@rentverse.com` |
+| **🔑 Password** | `password123` |
+
+> [!IMPORTANT]
+> **Testing User & Landlord Features:** You must sign up using a **real email address** to test User and Landlord functionalities. The system enforces OTP verification on both the Web and Mobile applications, so fake or invalid emails will not work.
+
 ## 🔐 Security Features Overview
 
 | Module | Status | Description |
