@@ -94,12 +94,12 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
   return (
     <div className={clsx(['relative', className])} {...propsRest}>
       <div
-        className="flex flex-col md:flex-row items-stretch md:items-center glass rounded-3xl md:rounded-full shadow-glass border-white/40 p-2 md:p-1 max-w-4xl mx-auto overflow-visible transition-all duration-300 hover:shadow-xl bg-white/80 md:bg-white/40 backdrop-blur-md">
+        className="flex flex-col lg:flex-row items-stretch lg:items-center glass rounded-3xl lg:rounded-full shadow-glass border-white/40 p-2 lg:p-1 max-w-4xl mx-auto overflow-visible transition-all duration-300 hover:shadow-xl bg-white/80 lg:bg-white/40 backdrop-blur-md">
         {/* Where Section */}
         <div
           className={clsx([
-            'flex-1 px-6 py-4 border-b md:border-b-0 md:border-r border-neutral-200/50 cursor-pointer flex flex-col justify-center transition-colors',
-            'hover:bg-brand-50/30 rounded-t-2xl md:rounded-l-full md:rounded-tr-none',
+            'flex-1 px-6 py-4 border-b lg:border-b-0 lg:border-r border-neutral-200/50 cursor-pointer flex flex-col justify-center transition-colors',
+            'hover:bg-brand-50/30 rounded-t-2xl lg:rounded-l-full lg:rounded-tr-none',
             isWhereOpen && 'bg-brand-50/50',
           ])}
           onClick={() => setIsWhereOpen(true)}
@@ -124,7 +124,7 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
         {/* Duration Section */}
         <div
           className={clsx([
-            'flex-1 px-6 py-4 border-b md:border-b-0 md:border-r border-neutral-200/50 cursor-pointer flex flex-col justify-center transition-colors',
+            'flex-1 px-6 py-4 border-b lg:border-b-0 lg:border-r border-neutral-200/50 cursor-pointer flex flex-col justify-center transition-colors',
             'hover:bg-brand-50/30',
             isDurationOpen && 'bg-brand-50/50',
           ])}
@@ -139,7 +139,7 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
         <div
           className={clsx([
             'flex-1 px-6 py-4 cursor-pointer flex flex-col justify-center transition-colors',
-            'hover:bg-brand-50/30 rounded-b-2xl md:rounded-r-full md:rounded-l-none',
+            'hover:bg-brand-50/30 rounded-b-2xl lg:rounded-r-full lg:rounded-l-none',
             isTypeOpen && 'bg-brand-50/50',
           ])}
           onClick={() => setIsTypeOpen(!isTypeOpen)}
@@ -150,11 +150,11 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
         </div>
 
         {/* Search Button */}
-        <div className="p-2 md:pl-2 md:pr-2">
+        <div className="p-2 lg:pl-2 lg:pr-2">
           <button
             onClick={handleSearch}
-            className="flex items-center justify-center w-full md:w-12 h-12 bg-gradient-to-r from-brand-600 to-accent-600 hover:scale-[1.02] md:hover:scale-105 hover:shadow-lg hover:shadow-brand-500/25 rounded-2xl md:rounded-full transition-all duration-300 cursor-pointer text-white font-medium">
-            <span className="md:hidden mr-2">Search Properties</span>
+            className="flex items-center justify-center w-full lg:w-12 h-12 bg-gradient-to-r from-brand-600 to-accent-600 hover:scale-[1.02] lg:hover:scale-105 hover:shadow-lg hover:shadow-brand-500/25 rounded-2xl lg:rounded-full transition-all duration-300 cursor-pointer text-white font-medium">
+            <span className="lg:hidden mr-2">Search Properties</span>
             <Search size={20} />
           </button>
         </div>

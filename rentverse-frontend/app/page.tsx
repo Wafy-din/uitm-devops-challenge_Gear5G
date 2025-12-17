@@ -43,8 +43,8 @@ export default function Home() {
               The #1 Rental Platform in Malaysia
             </div>
 
-            <h1 className="font-serif text-4xl md:text-7xl min-[1400px]:text-8xl text-neutral-900 tracking-tight leading-[1.1] mb-6 animate-fade-in-up delay-100">
-              Find your perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 italic">Verse</span> <br className="hidden md:block" />
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-7xl min-[1400px]:text-8xl text-neutral-900 tracking-tight leading-[1.1] mb-6 animate-fade-in-up delay-100">
+              Find your perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 italic">Verse</span> <br className="hidden lg:block" />
               to call home.
             </h1>
 
@@ -53,7 +53,7 @@ export default function Home() {
               The future of renting is transparent, secure, and purely digital.
             </p>
 
-            <div className="animate-fade-in-up delay-300 w-full max-w-4xl mx-auto px-4 md:px-0">
+            <div className="animate-fade-in-up delay-300 w-full max-w-4xl mx-auto px-4 lg:px-0">
               <SearchBoxProperty className="transform transition-transform hover:scale-[1.01]" />
             </div>
 
