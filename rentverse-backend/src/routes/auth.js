@@ -330,19 +330,7 @@ router.post(
         });
       }
 
-      // Check if MFA is enabled
-      const MFA_WHITELIST = [
-        'scraper@rentverse.my',
-        'superadmin@rentverse.com',
-        'landlord3@rentverse.com',
-        'tenant2@rentverse.com',
-        'landlord2@rentverse.com',
-        'tenant@rentverse.com',
-        'landlord@rentverse.com',
-        'admin@rentverse.com'
-      ];
-
-      if (user.mfaEnabled && !MFA_WHITELIST.includes(user.email)) {
+      if (user.mfaEnabled) {
         // Generate OTP and create session token for MFA flow
         const { otp, expiresAt } = await otpService.createOtp(user.id, 'LOGIN');
 

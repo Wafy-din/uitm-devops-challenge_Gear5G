@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Property } from '@/types/property'
 import { FavoritesApiClient } from '@/utils/favoritesApiClient'
+import useCurrentUser from '@/hooks/useCurrentUser'
 
 export const useFavorites = (page: number = 1, limit: number = 10) => {
   const [favorites, setFavorites] = useState<Property[]>([])
@@ -13,14 +14,26 @@ export const useFavorites = (page: number = 1, limit: number = 10) => {
     pages: 1
   })
 
+  const { isAuthenticated, isLoading: isAuthLoading } = useCurrentUser()
+
   const fetchFavorites = useCallback(async () => {
+    // If auth is still loading, wait
+    if (isAuthLoading) return
+
+    // If not authenticated, don't fetch and clear favorites
+    if (!isAuthenticated) {
+      setFavorites([])
+      setIsLoading(false)
+      return
+    }
+
     try {
       setIsLoading(true)
       setError(null)
-      
+
       console.log('Fetching favorites from API...')
       const response = await FavoritesApiClient.getFavorites(page, limit)
-      
+
       if (response.success && response.data) {
         setFavorites(response.data.favorites)
         setPagination(response.data.pagination)
@@ -31,10 +44,10 @@ export const useFavorites = (page: number = 1, limit: number = 10) => {
     } catch (err) {
       console.error('Error fetching favorites:', err)
       let errorMessage = 'Unknown error'
-      
+
       if (err instanceof Error) {
         errorMessage = err.message
-        
+
         // Provide more helpful error messages
         if (err.message.includes('Failed to fetch') || err.message.includes('Unable to connect')) {
           errorMessage = 'Network error - check your internet connection'
@@ -48,15 +61,21 @@ export const useFavorites = (page: number = 1, limit: number = 10) => {
           errorMessage = 'Server error - please try again later'
         }
       }
-      
+
       setError(errorMessage)
       setFavorites([]) // Clear favorites on error
     } finally {
       setIsLoading(false)
     }
-  }, [page, limit])
+  }, [page, limit, isAuthenticated, isAuthLoading])
 
   const addToFavorites = async (propertyId: string) => {
+    if (!isAuthenticated) {
+      console.warn('Cannot add to favorites: User not authenticated')
+      // Optionally trigger login modal or redirect here
+      return
+    }
+
     try {
       await FavoritesApiClient.addToFavorites(propertyId)
       // Refresh the favorites list
@@ -68,6 +87,8 @@ export const useFavorites = (page: number = 1, limit: number = 10) => {
   }
 
   const removeFromFavorites = async (propertyId: string) => {
+    if (!isAuthenticated) return
+
     try {
       await FavoritesApiClient.removeFromFavorites(propertyId)
       // Remove from local state immediately for better UX
@@ -86,7 +107,7 @@ export const useFavorites = (page: number = 1, limit: number = 10) => {
 
   return {
     favorites,
-    isLoading,
+    isLoading: isLoading || isAuthLoading, // Combine loading states
     error,
     pagination,
     fetchFavorites,
