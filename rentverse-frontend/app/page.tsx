@@ -40,12 +40,12 @@ export default function Home() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
               </span>
-              The #1 Rental Platform in Malaysia
+              Rental Platform in Malaysia
             </div>
 
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-7xl min-[1400px]:text-8xl text-neutral-900 tracking-tight leading-[1.1] mb-6 animate-fade-in-up delay-100">
-              Find your perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 italic">Verse</span> <br className="hidden lg:block" />
-              to call home.
+              The right <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 italic">Home</span> <br className="hidden lg:block" />
+              is waiting for you.
             </h1>
 
             <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-in-up delay-200">
@@ -101,9 +101,9 @@ export default function Home() {
 
           <div className="max-w-6xl mx-auto relative z-10">
             <div className="text-center mb-16 max-w-3xl mx-auto">
-              <h2 className="font-serif text-3xl md:text-5xl text-neutral-900 mb-6">Manage rentals with clarity</h2>
+              <h2 className="font-serif text-3xl md:text-5xl text-neutral-900 mb-6">Discover your booking with Gear5G</h2>
               <p className="text-lg text-neutral-600">
-                From digital agreements to automated rent collection, RentVerse empowers you with a complete suite of tools.
+                Trusted by Thousands of Tenants and Property Owners
               </p>
             </div>
 
