@@ -20,7 +20,7 @@ This repository contains the complete implementation for the UiTM Mobile SecOps 
 |:-----:|------|------------|
 | <img src="github/assets/Wafi.png" width="100"> | **MOHAMMAD WAFIUDDIN BIN MOHD NUBLI** | `2024745953` |
 | <img src="github/assets/Faheem.png" width="100"> | **MUHAMMAD FAHEEM BIN HASWANORRIZAM** | `2024793085` |
-| <img src="github/assets/Akmal.png" width="100"> | **MUHAMMAD AKMAL BIN MOHAMAD RODZAI** | `2024988405` |
+| <img src="github/assets/AkmalA.png" width="100"> | **MUHAMMAD AKMAL BIN MOHAMAD RODZAI** | `2024988405` |
 
 ## �📚 Documentation & Guides
 
