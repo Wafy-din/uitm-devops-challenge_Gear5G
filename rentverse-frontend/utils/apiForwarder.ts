@@ -15,12 +15,12 @@ export async function forwardRequest(
   options: ForwardRequestOptions = {},
 ): Promise<Response> {
   const { timeout = 30000, retries = 0, ...fetchOptions } = options
-  
+
   // Ensure proper URL construction by removing trailing slash from base and leading slash from endpoint
   const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
   const url = `${baseUrl}${cleanEndpoint}`
-  
+
   // Debug log for development
   if (process.env.NODE_ENV === 'development') {
     console.log(`[API] ${options.method || 'GET'} ${url}`)
@@ -130,8 +130,8 @@ export async function propertiesApiForwarder(
     const queryString = searchParams.toString()
     const fullEndpoint = queryString ? `${endpoint}?${queryString}` : endpoint
 
-    const body = ['POST', 'PUT', 'PATCH'].includes(request.method) 
-      ? await request.text() 
+    const body = ['POST', 'PUT', 'PATCH'].includes(request.method)
+      ? await request.text()
       : undefined
 
     console.log('[Properties API Forwarder]', {
@@ -172,14 +172,14 @@ export async function propertiesApiForwarder(
 
     const data = await response.json()
     console.log('[Properties API Forwarder] JSON response:', JSON.stringify(data).substring(0, 200))
-    
+
     return Response.json(data, {
       status: response.status,
     })
 
   } catch (error) {
     console.error('[Properties API Forwarder] Error:', error)
-    
+
     return Response.json(
       createErrorResponse(
         'Failed to forward properties request',

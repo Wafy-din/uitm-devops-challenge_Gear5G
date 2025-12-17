@@ -65,10 +65,10 @@ const nextConfig = {
   },
   async rewrites() {
     const apiBaseUrl = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-    
+
     // Remove trailing slash from apiBaseUrl if present
     const cleanApiBaseUrl = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
-    
+
     return [
       // Properties API routes - order matters, more specific routes first
       {
