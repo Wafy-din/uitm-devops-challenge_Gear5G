@@ -107,20 +107,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="relative group">
-              {/* Glow effect behind dashboard */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
 
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-neutral-200/50 bg-neutral-900">
-                <Image
-                  src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758186240/rentverse-base/sample-dashboard_h7ez5z.png"
-                  alt="Rentverse Dashboard Interface"
-                  width={1200}
-                  height={800}
-                  className="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                />
-              </div>
-            </div>
           </div>
         </section>
 

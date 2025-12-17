@@ -9,5 +9,6 @@
 - [x] **Fix Homepage UI** <!-- id: 8 -->
     - [x] Fix Trending dropdown z-index overlap <!-- id: 9 -->
     - [x] Fix Stats section blocking dropdown <!-- id: 10 -->
+    - [x] Remove dashboard preview image <!-- id: 11 -->
 - [ ] Rebuild APK with new URL <!-- id: 5 -->
 - [ ] Verify PDF download functionality <!-- id: 6 -->
