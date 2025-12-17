@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     // For development: use localhost
     // url: 'http://localhost:3000',
     // cleartext: true,
-    url: 'https://rentverse-frontend-8g9kji5u8-wafis-projects-cd60a682.vercel.app',  // Paste URL di sini
+    url: 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app',  // Paste URL di sini
     // For production: use deployed URL
     // Uncomment after deploying to Vercel
     // url: 'https://your-app.vercel.app',

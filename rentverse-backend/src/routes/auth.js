@@ -330,6 +330,7 @@ router.post(
         });
       }
 
+      // Check if MFA is enabled
       if (user.mfaEnabled) {
         // Generate OTP and create session token for MFA flow
         const { otp, expiresAt } = await otpService.createOtp(user.id, 'LOGIN');
@@ -1059,7 +1060,7 @@ router.get(
     try {
       if (!req.user) {
         return res.redirect(
-          `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`
+          `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_failed`
         );
       }
 
@@ -1072,12 +1073,12 @@ router.get(
 
       // Redirect to frontend with token
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?token=${token}&provider=google`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/auth/callback?token=${token}&provider=google`
       );
     } catch (error) {
       console.error('Google OAuth callback error:', error);
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_error`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_error`
       );
     }
   }
@@ -1119,7 +1120,7 @@ router.get(
     try {
       if (!req.user) {
         return res.redirect(
-          `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`
+          `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_failed`
         );
       }
 
@@ -1132,12 +1133,12 @@ router.get(
 
       // Redirect to frontend with token
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?token=${token}&provider=facebook`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/auth/callback?token=${token}&provider=facebook`
       );
     } catch (error) {
       console.error('Facebook OAuth callback error:', error);
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_error`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_error`
       );
     }
   }
@@ -1179,7 +1180,7 @@ router.get(
     try {
       if (!req.user) {
         return res.redirect(
-          `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`
+          `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_failed`
         );
       }
 
@@ -1192,12 +1193,12 @@ router.get(
 
       // Redirect to frontend with token
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?token=${token}&provider=github`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/auth/callback?token=${token}&provider=github`
       );
     } catch (error) {
       console.error('GitHub OAuth callback error:', error);
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_error`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_error`
       );
     }
   }
@@ -1234,7 +1235,7 @@ router.get(
     try {
       if (!req.user) {
         return res.redirect(
-          `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`
+          `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_failed`
         );
       }
 
@@ -1247,12 +1248,12 @@ router.get(
 
       // Redirect to frontend with token
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?token=${token}&provider=twitter`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/auth/callback?token=${token}&provider=twitter`
       );
     } catch (error) {
       console.error('Twitter OAuth callback error:', error);
       res.redirect(
-        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_error`
+        `${process.env.FRONTEND_URL || 'https://gear5g-rentverse-qo59lmwpe-wafis-projects-cd60a682.vercel.app'}/login?error=oauth_error`
       );
     }
   }
