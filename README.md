@@ -16,11 +16,11 @@ This repository contains the complete implementation for the UiTM Mobile SecOps 
 
 ## � Team Members
 
-| Name | Student ID |
-|------|------------|
-| **MOHAMMAD WAFIUDDIN BIN MOHD NUBLI** | `2024745953` |
-| **MUHAMMAD FAHEEM BIN HASWANORRIZAM** | `2024793085` |
-| **MUHAMMAD AKMAL BIN MOHD RODZAI** | `2024988405` |
+| Photo | Name | Student ID |
+|:-----:|------|------------|
+| <img src="github/assets/Wafi.png" width="100"> | **MOHAMMAD WAFIUDDIN BIN MOHD NUBLI** | `2024745953` |
+| <img src="github/assets/Faheem.png" width="100"> | **MUHAMMAD FAHEEM BIN HASWANORRIZAM** | `2024793085` |
+| <img src="github/assets/Akmal.png" width="100"> | **MUHAMMAD AKMAL BIN MOHAMAD RODZAI** | `2024988405` |
 
 ## �📚 Documentation & Guides
 
@@ -58,7 +58,7 @@ cd rentverse-frontend
 npm install
 npm run dev
 ```
-Access the application at `http://localhost:3000`.
+Access the application at `https://gear5g-rentverse.vercel.app`.
 
 ### 2. Backend API
 Navigate to `rentverse-backend`:
