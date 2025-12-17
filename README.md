@@ -1,7 +1,6 @@
 # UiTM Mobile SecOps Challenge - Gear5G Team Solution
 
-> **Status:** 🏆 100% COMPLETED (All 10 Modules + 4 Bonus Features)  
-> **Prize Potential:** RM 4,000 (Maximum)  
+> **Status:** 100% COMPLETED (All 10 Modules + 4 Bonus Features)  
 > **Submission Date:** December 17, 2025
 
 ## 📋 Executive Summary
@@ -15,7 +14,15 @@ This repository contains the complete implementation for the UiTM Mobile SecOps 
 - **Adaptive Defense Dashboard**: Real-time risk visualization and automated response system.
 - **Automated Security Pipeline**: CI/CD with SAST (Semgrep/CodeQL) and DAST (OWASP ZAP).
 
-## 📚 Documentation & Guides
+## � Team Members
+
+| Name | Student ID | Role |
+|------|------------|------|
+| **MOHAMMAD WAFIUDDIN BIN MOHD NUBLI** | `2024745953` |
+| **MUHAMMAD FAHEEM BIN HASWANORRIZAM** | `2024793085` |
+| **MUHAMMAD AKMAL BIN MOHD RODZAI** | `2024988405` |
+
+## �📚 Documentation & Guides
 
 Start here to evaluate our submission:
 
