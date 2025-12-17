@@ -11,7 +11,7 @@ export default function Home() {
     <div className="bg-neutral-50 overflow-hidden">
       <ContentWrapper>
         {/* Modern Hero Section */}
-        <section className="relative min-h-[85vh] flex flex-col items-center justify-center pt-20 pb-12 px-4 mb-16 overflow-visible">
+        <section className="relative min-h-[600px] md:min-h-[85vh] flex flex-col items-center justify-center pt-20 pb-12 px-4 mb-16 overflow-visible">
 
           {/* Background Elements */}
           <div className="absolute inset-0 z-0 select-none">
@@ -43,8 +43,8 @@ export default function Home() {
               The #1 Rental Platform in Malaysia
             </div>
 
-            <h1 className="font-serif text-5xl md:text-7xl min-[1400px]:text-8xl text-neutral-900 tracking-tight leading-[1.1] mb-6 animate-fade-in-up delay-100">
-              Find your perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 italic">Verse</span> <br />
+            <h1 className="font-serif text-4xl md:text-7xl min-[1400px]:text-8xl text-neutral-900 tracking-tight leading-[1.1] mb-6 animate-fade-in-up delay-100">
+              Find your perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 italic">Verse</span> <br className="hidden md:block" />
               to call home.
             </h1>
 
@@ -101,7 +101,7 @@ export default function Home() {
 
           <div className="max-w-6xl mx-auto relative z-10">
             <div className="text-center mb-16 max-w-3xl mx-auto">
-              <h2 className="font-serif text-4xl md:text-5xl text-neutral-900 mb-6">Manage rentals with clarity</h2>
+              <h2 className="font-serif text-3xl md:text-5xl text-neutral-900 mb-6">Manage rentals with clarity</h2>
               <p className="text-lg text-neutral-600">
                 From digital agreements to automated rent collection, RentVerse empowers you with a complete suite of tools.
               </p>
