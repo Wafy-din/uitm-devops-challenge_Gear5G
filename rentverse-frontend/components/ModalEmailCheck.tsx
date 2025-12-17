@@ -4,7 +4,6 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import clsx from 'clsx'
-import { Capacitor } from '@capacitor/core'
 import InputEmail from './InputEmail'
 import ButtonFilled from './ButtonFilled'
 import useAuthStore from '@/stores/authStore'
@@ -48,10 +47,8 @@ function ModalEmailCheck({ isModal = true }: Readonly<ModalEmailCheckProps>) {
   }
 
   const handleGoogleLogin = () => {
-    const isMobile = Capacitor.isNativePlatform()
-
     // Redirect to Google OAuth endpoint
-    window.location.href = `/api/auth/google${isMobile ? '?platform=mobile' : ''}`
+    window.location.href = '/api/auth/google'
   }
 
   const containerContent = (
