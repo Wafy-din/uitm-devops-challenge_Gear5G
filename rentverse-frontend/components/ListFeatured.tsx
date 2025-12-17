@@ -37,11 +37,11 @@ function ListFeatured() {
     <div className="py-16 px-4 md:px-16 overflow-hidden">
       {/* Section title */}
       <div className="mb-12">
-        <h2 className="font-serif text-3xl text-teal-900 mb-4">
-          Featured Properties For You
+        <h2 className="font-serif text-3xl text-neutral-900 mb-4 tracking-tight">
+          Featured Properties
         </h2>
-        <p className="text-base text-teal-800 max-w-2xl">
-          A selection of verified properties in the most sought-after locations
+        <p className="text-base text-neutral-600 max-w-2xl font-medium">
+          A curated selection of verified homes in the most sought-after locations.
         </p>
       </div>
 

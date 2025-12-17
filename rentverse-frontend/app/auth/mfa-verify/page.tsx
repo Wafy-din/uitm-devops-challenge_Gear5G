@@ -17,21 +17,24 @@ export default function MFAVerifyPage() {
   useEffect(() => {
     const pendingEmail = localStorage.getItem('mfaPendingEmail')
     const sessionToken = localStorage.getItem('mfaSessionToken')
-    
+
     if (!pendingEmail || !sessionToken) {
       toast.error('No MFA session found. Please log in again.')
       router.push('/auth')
       return
     }
-    
+
     setEmail(pendingEmail)
   }, [router])
 
-  const handleVerifyOTP = async () => {
-    console.log('[MFA Page] handleVerifyOTP called with OTP:', otp, 'Length:', otp.length)
-    
-    if (otp.length !== 6) {
-      console.log('[MFA Page] OTP length invalid:', otp.length)
+  const handleVerifyOTP = async (otpCode?: string) => {
+    // If called from button click, otpCode is event object, so ignore it using type check or just use state
+    // If called from onComplete, otpCode is the string
+    const codeToVerify = typeof otpCode === 'string' ? otpCode : otp
+    console.log('[MFA Page] handleVerifyOTP called with OTP:', codeToVerify, 'Length:', codeToVerify.length)
+
+    if (codeToVerify.length !== 6) {
+      console.log('[MFA Page] OTP length invalid:', codeToVerify.length)
       toast.error('Please enter a 6-digit OTP')
       return
     }
@@ -40,10 +43,10 @@ export default function MFAVerifyPage() {
     setIsLoading(true)
     try {
       const sessionToken = localStorage.getItem('mfaSessionToken')
-      
+
       console.log('[MFA Page] Session token:', sessionToken ? 'exists' : 'missing')
-      console.log('[MFA Page] Sending request with OTP:', otp)
-      
+      console.log('[MFA Page] Sending request with OTP:', codeToVerify)
+
       const response = await fetch('/api/auth/verify-mfa', {
         method: 'POST',
         headers: {
@@ -51,12 +54,12 @@ export default function MFAVerifyPage() {
         },
         body: JSON.stringify({
           sessionToken,
-          otp,
+          otp: codeToVerify,
         }),
       })
 
       console.log('[MFA Page] Response status:', response.status)
-      
+
       const result = await response.json()
 
       console.log('[MFA Page] Response data:', result)
@@ -67,10 +70,10 @@ export default function MFAVerifyPage() {
         localStorage.setItem('authToken', authToken)
         localStorage.setItem('authUser', JSON.stringify(result.data.user))
         setCookie('authToken', authToken, 7)
-        
+
         localStorage.removeItem('mfaSessionToken')
         localStorage.removeItem('mfaPendingEmail')
-        
+
         toast.success('Login successful!')
         window.location.href = '/'
       } else {
@@ -89,9 +92,9 @@ export default function MFAVerifyPage() {
     setIsLoading(true)
     try {
       const sessionToken = localStorage.getItem('mfaSessionToken')
-      
+
       console.log('[MFA Page] Resending OTP with session token:', sessionToken ? 'exists' : 'missing')
-      
+
       const response = await fetch('/api/auth/resend-otp', {
         method: 'POST',
         headers: {
@@ -101,7 +104,7 @@ export default function MFAVerifyPage() {
       })
 
       console.log('[MFA Page] Resend response status:', response.status)
-      
+
       const result = await response.json()
 
       console.log('[MFA Page] Resend response data:', result)
@@ -128,7 +131,7 @@ export default function MFAVerifyPage() {
               Verify Your Identity
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              We've sent a 6-digit code to <strong>{email}</strong>
+              We&apos;ve sent a 6-digit code to <strong>{email}</strong>
             </p>
           </div>
 
@@ -166,7 +169,7 @@ export default function MFAVerifyPage() {
                 disabled={isLoading}
                 className="text-sm text-teal-600 hover:text-teal-700 font-medium disabled:opacity-50"
               >
-                Didn't receive the code? Resend
+                Didn&apos;t receive the code? Resend
               </button>
             </div>
 

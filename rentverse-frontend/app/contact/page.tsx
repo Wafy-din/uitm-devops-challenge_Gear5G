@@ -8,7 +8,7 @@ export default function ContactPage() {
         <h1 className="text-4xl font-bold text-slate-900 mb-6 text-center">Contact Us</h1>
         
         <p className="text-lg text-slate-700 mb-12 text-center max-w-2xl mx-auto">
-          Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+          Have questions? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
         </p>
 
         <div className="grid md:grid-cols-2 gap-12">

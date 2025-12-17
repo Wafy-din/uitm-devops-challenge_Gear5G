@@ -14,7 +14,7 @@ interface SecurityActions {
   clearAlerts: () => void
   addLog: (log: Omit<SecurityLog, 'id' | 'timestamp'>) => void
   fetchAlerts: () => Promise<void>
-  fetchLogs: (filters?: any) => Promise<void>
+  fetchLogs: (filters?: Record<string, unknown>) => Promise<void>
   startMonitoring: () => void
   stopMonitoring: () => void
 }
@@ -100,7 +100,7 @@ const useSecurityStore = create<SecurityStore>((set, get) => ({
     }
   },
 
-  fetchLogs: async (filters = {}) => {
+  fetchLogs: async (filters: Record<string, unknown> = {}) => {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
       if (!token) {
@@ -125,7 +125,25 @@ const useSecurityStore = create<SecurityStore>((set, get) => ({
         
         if (data.success && data.data.logins) {
           // Transform login history to security logs format
-          const transformedLogs = data.data.logins.map((login: any) => ({
+          interface LoginHistoryItem {
+            id: string
+            createdAt: string
+            userId: string
+            user?: {
+              email: string
+              firstName?: string
+              lastName?: string
+              role: string
+            }
+            ipAddress?: string
+            success: boolean
+            riskScore: number
+            userAgent?: string
+            location?: string
+            failReason?: string
+          }
+
+          const transformedLogs = data.data.logins.map((login: LoginHistoryItem) => ({
             id: login.id,
             timestamp: login.createdAt,
             action: 'login',
@@ -176,15 +194,15 @@ const useSecurityStore = create<SecurityStore>((set, get) => ({
     }, 30000)
 
     if (typeof window !== 'undefined') {
-      ;(window as any).__securityMonitorInterval = interval
+      ;(window as WindowWithSecurity).__securityMonitorInterval = interval
     }
   },
 
   stopMonitoring: () => {
     set({ isMonitoring: false })
     
-    if (typeof window !== 'undefined' && (window as any).__securityMonitorInterval) {
-      clearInterval((window as any).__securityMonitorInterval)
+    if (typeof window !== 'undefined' && (window as WindowWithSecurity).__securityMonitorInterval) {
+      clearInterval((window as WindowWithSecurity).__securityMonitorInterval)
     }
   },
 }))

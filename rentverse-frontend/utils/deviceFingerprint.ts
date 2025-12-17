@@ -48,7 +48,7 @@ export function generateClientFingerprint(): DeviceFingerprint {
     screenResolution: screen ? `${screen.width}x${screen.height}x${screen.colorDepth}` : '',
     colorDepth: screen?.colorDepth || 0,
     hardwareConcurrency: nav?.hardwareConcurrency || 0,
-    deviceMemory: (nav as any)?.deviceMemory,
+    deviceMemory: (nav as Navigator & { deviceMemory?: number })?.deviceMemory,
     vendor: nav?.vendor || '',
     webglSupport: detectWebGLSupport(),
     touchSupport: detectTouchSupport(),
@@ -70,7 +70,7 @@ function detectWebGLSupport(): boolean {
   try {
     const canvas = document.createElement('canvas')
     return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
-  } catch (e) {
+  } catch {
     return false
   }
 }
@@ -95,7 +95,7 @@ function generateCanvasFingerprint(): string {
     ctx.fillText('DeviceCheck', 2, 15)
     
     return canvas.toDataURL().substring(0, 50)
-  } catch (e) {
+  } catch {
     return ''
   }
 }

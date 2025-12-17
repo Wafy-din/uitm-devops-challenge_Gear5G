@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
-import { generateDeviceFingerprint, calculateDeviceTrustScore } from '@/utils/deviceFingerprint'
-import { getLocationFromIP, isLocationAllowed, detectImpossibleTravel, calculateLocationRiskScore } from '@/utils/geoLocation'
+import { generateDeviceFingerprint } from '@/utils/deviceFingerprint'
+import { detectImpossibleTravel } from '@/utils/geoLocation'
 
 export interface TrustScore {
   overall: number
@@ -14,7 +14,7 @@ export interface ZeroTrustContext {
   userId: string
   deviceFingerprint: string
   ipAddress: string
-  location: any
+  location: Record<string, unknown> | null
   trustScore: TrustScore
   action: string
   timestamp: string
@@ -36,9 +36,9 @@ export async function evaluateZeroTrust(
   let behaviorScore = 50
 
   const deviceFingerprint = generateDeviceFingerprint(request)
-  
-  const knownDevices: any[] = []
-  const isKnownDevice = knownDevices.some(d => d.fingerprint === deviceFingerprint)
+
+  const knownDevices: Array<Record<string, unknown>> = []
+  const isKnownDevice = knownDevices.some(d => (d.fingerprint as string) === deviceFingerprint)
   
   if (isKnownDevice) {
     deviceScore = 80
@@ -63,7 +63,7 @@ export async function evaluateZeroTrust(
         reasons.push(`High-risk location: ${location.country}`)
       }
       
-      const previousLocations: any[] = []
+      const previousLocations: Array<Record<string, unknown>> = []
       if (previousLocations.length > 0) {
         const lastLocation = previousLocations[previousLocations.length - 1]
         const timeDiff = 30

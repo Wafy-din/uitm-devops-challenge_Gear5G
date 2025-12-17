@@ -18,7 +18,7 @@ class BookingsService {
   ) {
     const where = {
       propertyId,
-      status: { in: ['APPROVED', 'ACTIVE'] },
+      status: { in: ['APPROVED', 'ACTIVE', 'PENDING'] },
       OR: [
         // Check for date overlaps
         {
@@ -35,7 +35,7 @@ class BookingsService {
       where.id = { not: excludeLeaseId };
     }
 
-    const overlappingLease = await prisma.lease.findFirst({ 
+    const overlappingLease = await prisma.lease.findFirst({
       where,
       select: { id: true }
     });
@@ -317,6 +317,16 @@ class BookingsService {
               firstName: true,
               lastName: true,
               name: true,
+            },
+          },
+          tenant: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+              name: true,
+              phone: true,
             },
           },
         },

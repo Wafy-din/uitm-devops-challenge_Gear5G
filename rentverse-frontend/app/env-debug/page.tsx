@@ -41,7 +41,7 @@ export default function EnvDebugPage() {
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
           <p className="text-sm text-yellow-800">
             <strong>Expected:</strong> NEXT_PUBLIC_API_BASE_URL should be 
-            "https://rentverse-backend-emqy.onrender.com"
+            &quot;https://rentverse-backend-emqy.onrender.com&quot;
           </p>
           <p className="text-sm text-yellow-800 mt-2">
             If not set correctly, restart the dev server after creating/updating .env.local

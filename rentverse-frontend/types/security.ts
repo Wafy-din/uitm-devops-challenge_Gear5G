@@ -28,7 +28,7 @@ export interface SecurityLog {
   timestamp: string
   status: 'success' | 'failed' | 'suspicious'
   riskLevel: 'low' | 'medium' | 'high'
-  details?: any
+  details?: Record<string, unknown>
 }
 
 export interface ThreatAlert {

@@ -42,17 +42,16 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
   const { className, ...propsRest } = props
 
   // Handle search functionality
-  const handleSearch = async () => {
-    const filters = {
-      city: whereValue || undefined,
-      type: typeValue || undefined,
-      page: 1,
-      limit: 10,
-    }
-    
-    // Perform search and navigate to results page
-    await searchProperties(filters)
-    router.push('/property/result')
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+
+    if (whereValue) params.set('city', whereValue)
+    if (typeValue) params.set('type', typeValue)
+
+    const queryString = params.toString()
+    const url = queryString ? `/property/result?${queryString}` : '/property/result'
+
+    router.push(url)
   }
 
   // Handle location selection without triggering search
@@ -95,18 +94,18 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
   return (
     <div className={clsx(['relative', className])} {...propsRest}>
       <div
-        className="flex items-center bg-white rounded-full shadow-lg border border-slate-200 p-0 max-w-4xl mx-auto overflow-hidden">
+        className="flex items-center glass rounded-full shadow-glass border-white/40 p-1 max-w-4xl mx-auto overflow-visible transition-all duration-300 hover:shadow-xl">
         {/* Where Section */}
         <div
           className={clsx([
-            'flex-1 pl-8 pr-6 py-5 border-r border-slate-200 cursor-pointer flex flex-col justify-center',
-            'hover:bg-slate-50',
-            isWhereOpen && 'bg-slate-50',
+            'flex-1 pl-8 pr-6 py-4 border-r border-neutral-200/50 cursor-pointer flex flex-col justify-center rounded-l-full transition-colors',
+            'hover:bg-brand-50/30',
+            isWhereOpen && 'bg-brand-50/50',
           ])}
           onClick={() => setIsWhereOpen(true)}
         >
           <label
-            className="block text-xs font-semibold text-slate-900 mb-1 uppercase tracking-wide text-left">Where</label>
+            className="block text-xs font-bold text-neutral-800 mb-1 uppercase tracking-wider text-left">Where</label>
           <input
             type="text"
             placeholder="Search destinations"
@@ -118,44 +117,44 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
                 handleSearch()
               }
             }}
-            className="w-full text-sm text-slate-600 placeholder-slate-400 bg-transparent border-none outline-none font-medium text-left"
+            className="w-full text-sm text-neutral-700 placeholder-neutral-400 bg-transparent border-none outline-none font-medium text-left truncate"
           />
         </div>
 
         {/* Duration Section */}
         <div
           className={clsx([
-            'flex-1 px-6 py-5 border-r border-slate-200 cursor-pointer flex flex-col justify-center',
-            'hover:bg-slate-50',
-            isDurationOpen && 'bg-slate-50',
+            'flex-1 px-6 py-4 border-r border-neutral-200/50 cursor-pointer flex flex-col justify-center transition-colors',
+            'hover:bg-brand-50/30',
+            isDurationOpen && 'bg-brand-50/50',
           ])}
           onClick={() => setIsDurationOpen(!isDurationOpen)}
         >
           <label
-            className="block text-xs font-semibold text-slate-900 mb-1 uppercase tracking-wide text-left">Duration</label>
-          <span className="text-sm text-slate-600 font-medium text-left">{getDurationText()}</span>
+            className="block text-xs font-bold text-neutral-800 mb-1 uppercase tracking-wider text-left">Duration</label>
+          <span className="text-sm text-neutral-700 font-medium text-left truncate">{getDurationText()}</span>
         </div>
 
         {/* Type Section */}
         <div
           className={clsx([
-            'flex-1 px-6 py-5 cursor-pointer flex flex-col justify-center',
-            'hover:bg-slate-50',
-            isTypeOpen && 'bg-slate-50',
+            'flex-1 px-6 py-4 cursor-pointer flex flex-col justify-center rounded-r-full transition-colors',
+            'hover:bg-brand-50/30',
+            isTypeOpen && 'bg-brand-50/50',
           ])}
           onClick={() => setIsTypeOpen(!isTypeOpen)}
         >
           <label
-            className="block text-xs font-semibold text-slate-900 mb-1 uppercase tracking-wide text-left">Type</label>
-          <span className="text-sm text-slate-600 font-medium text-left">{getTypeText()}</span>
+            className="block text-xs font-bold text-neutral-800 mb-1 uppercase tracking-wider text-left">Type</label>
+          <span className="text-sm text-neutral-700 font-medium text-left truncate">{getTypeText()}</span>
         </div>
 
         {/* Search Button */}
-        <div className="ml-4 pr-4">
+        <div className="pl-2 pr-2">
           <button
             onClick={handleSearch}
-            className="flex items-center justify-center w-12 h-12 bg-teal-600 hover:bg-teal-700 rounded-full transition-colors cursor-pointer">
-            <Search size={20} className="text-white" />
+            className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-brand-600 to-accent-600 hover:scale-105 hover:shadow-lg hover:shadow-brand-500/25 rounded-full transition-all duration-300 cursor-pointer text-white">
+            <Search size={20} />
           </button>
         </div>
       </div>
@@ -212,17 +211,17 @@ function SearchBoxProperty(props: Readonly<React.HTMLAttributes<HTMLDivElement>>
                 location.name.toLowerCase().includes(whereValue.toLowerCase()) ||
                 location.description.toLowerCase().includes(whereValue.toLowerCase()),
               ).length === 0 && (
-                <div className="flex items-center p-3 text-slate-500">
-                  <div
-                    className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-lg mr-4 flex-shrink-0">
-                    <Search size={20} className="text-slate-400" />
+                  <div className="flex items-center p-3 text-slate-500">
+                    <div
+                      className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-lg mr-4 flex-shrink-0">
+                      <Search size={20} className="text-slate-400" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <div className="font-medium text-slate-600 text-left">No locations found</div>
+                      <div className="text-sm text-slate-400 text-left">Try searching for a different location</div>
+                    </div>
                   </div>
-                  <div className="flex-1 text-left">
-                    <div className="font-medium text-slate-600 text-left">No locations found</div>
-                    <div className="text-sm text-slate-400 text-left">Try searching for a different location</div>
-                  </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
         )}

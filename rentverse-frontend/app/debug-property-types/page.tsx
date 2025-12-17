@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react'
 import { usePropertyTypes } from '@/hooks/usePropertyTypes'
 
+import Link from 'next/link'
+
 export default function DebugPropertyTypesPage() {
   const { propertyTypes, isLoading, error } = usePropertyTypes()
-  const [storageData, setStorageData] = useState<any>(null)
+  const [storageData, setStorageData] = useState<Record<string, unknown> | null>(null)
 
   useEffect(() => {
     // Check what's in localStorage
@@ -83,12 +85,12 @@ export default function DebugPropertyTypesPage() {
           >
             Clear Storage
           </a>
-          <a
+          <Link
             href="/property/new"
             className="bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700"
           >
             Go to Property Listing
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Shield, TrendingUp, AlertTriangle, Users, Activity, RefreshCw, Clock } from 'lucide-react'
+import Link from 'next/link'
+import { Shield, TrendingUp, AlertTriangle, Users, Activity, RefreshCw, Clock, ArrowLeft } from 'lucide-react'
 import ContentWrapper from '@/components/ContentWrapper'
 import LoginHistoryTable from '@/components/LoginHistoryTable'
 import SecurityMetrics from '@/components/SecurityMetrics'
@@ -68,6 +69,13 @@ export default function SecurityLogsPage() {
       <div className="py-8 px-4">
         <div className="flex items-center justify-between mb-6">
           <div>
+            <Link
+              href="/admin"
+              className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4 transition-colors"
+            >
+              <ArrowLeft size={16} className="mr-1" />
+              Back to Dashboard
+            </Link>
             <h1 className="text-3xl font-bold text-slate-900 mb-2">Security Logs Dashboard</h1>
             <p className="text-slate-600">Monitor and analyze security events in real-time</p>
           </div>

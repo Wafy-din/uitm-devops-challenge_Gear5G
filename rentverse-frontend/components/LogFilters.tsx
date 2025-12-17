@@ -11,7 +11,7 @@ interface LogFiltersProps {
     dateTo: string
     searchTerm?: string
   }
-  onFilterChange: (filters: any) => void
+  onFilterChange: (filters: Record<string, unknown>) => void
 }
 
 export default function LogFilters({ filters, onFilterChange }: LogFiltersProps) {

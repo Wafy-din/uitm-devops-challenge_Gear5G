@@ -1,5 +1,11 @@
 import toast from 'react-hot-toast'
 
+interface ToastOptions {
+  duration?: number
+  position?: string
+  [key: string]: unknown
+}
+
 export const showToast = {
   success: (message: string) => {
     toast.success(message)
@@ -24,7 +30,7 @@ export const showToast = {
     return toast.promise(promise, messages)
   },
   
-  custom: (message: string, options?: any) => {
+  custom: (message: string, options?: ToastOptions) => {
     toast(message, options)
   },
   

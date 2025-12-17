@@ -7,6 +7,7 @@ import ButtonCircle from '@/components/ButtonCircle'
 import { ArrowLeft } from 'lucide-react'
 import { usePropertyTypes } from '@/hooks/usePropertyTypes'
 import useAuthStore from '@/stores/authStore'
+import { createApiUrl } from '@/utils/apiConfig'
 
 interface Property {
   id: string
@@ -103,7 +104,7 @@ function ModifyPropertyPage() {
           return
         }
 
-        const response = await fetch(`https://rentverse-be.jokoyuliyanto.my.id/api/properties/${propertyId}`, {
+        const response = await fetch(createApiUrl(`properties/${propertyId}`), {
           method: 'GET',
           headers: {
             'accept': 'application/json',
@@ -116,11 +117,11 @@ function ModifyPropertyPage() {
         }
 
         const data: PropertyResponse = await response.json()
-        
+
         if (data.success && data.data.property) {
           const propertyData = data.data.property
           console.log('[PROPERTY] Successfully loaded property:', propertyData)
-          
+
           // Check if the current user is the owner of this property
           if (user && propertyData.ownerId !== user.id) {
             console.log('[AUTH] User is not the owner of this property:', {
@@ -131,9 +132,9 @@ function ModifyPropertyPage() {
             setError('You are not authorized to modify this property. Only the property owner can make changes.')
             return
           }
-          
+
           setProperty(propertyData)
-          
+
           // Pre-fill form data with fetched property data - ensure all fields are properly set
           const newFormData = {
             title: propertyData.title || '',
@@ -144,9 +145,9 @@ function ModifyPropertyPage() {
             isAvailable: propertyData.isAvailable ?? true,
             status: propertyData.status || 'APPROVED'
           }
-          
+
           setFormData(newFormData)
-          
+
           console.log('[PROPERTY] Form pre-filled with:', newFormData)
           console.log('[PROPERTY] Original property data:', {
             title: propertyData.title,
@@ -207,7 +208,7 @@ function ModifyPropertyPage() {
         isAvailable: boolean
         status: string
       }> = {}
-      
+
       if (property) {
         if (formData.title !== property.title) updateData.title = formData.title
         if (formData.description !== property.description) updateData.description = formData.description
@@ -223,7 +224,7 @@ function ModifyPropertyPage() {
         return
       }
 
-      const response = await fetch(`https://rentverse-be.jokoyuliyanto.my.id/api/properties/${propertyId}`, {
+      const response = await fetch(createApiUrl(`properties/${propertyId}`), {
         method: 'PUT',
         headers: {
           'accept': 'application/json',
@@ -238,7 +239,7 @@ function ModifyPropertyPage() {
       }
 
       const data: PropertyResponse = await response.json()
-      
+
       if (data.success) {
         // Success - redirect back to property details or list
         router.push(`/property/all`)
@@ -279,7 +280,7 @@ function ModifyPropertyPage() {
         return
       }
 
-      const response = await fetch(`https://rentverse-be.jokoyuliyanto.my.id/api/properties/${propertyId}`, {
+      const response = await fetch(createApiUrl(`properties/${propertyId}`), {
         method: 'DELETE',
         headers: {
           'accept': 'application/json',
@@ -292,7 +293,7 @@ function ModifyPropertyPage() {
       }
 
       const data = await response.json()
-      
+
       if (data.success) {
         // Success - redirect to property list
         router.push(`/property/all`)
@@ -315,8 +316,8 @@ function ModifyPropertyPage() {
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [field]: field === 'furnished' || field === 'isAvailable' 
-        ? value === 'true' 
+      [field]: field === 'furnished' || field === 'isAvailable'
+        ? value === 'true'
         : value,
     }))
   }
@@ -564,7 +565,7 @@ function ModifyPropertyPage() {
                     <div className="text-slate-400 mb-2">
                       <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <p className="text-sm text-slate-500">Property photos will appear here</p>
@@ -576,11 +577,10 @@ function ModifyPropertyPage() {
                     <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm font-medium">
                       {formData.propertyType}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      formData.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${formData.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
                       formData.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
+                        'bg-red-100 text-red-700'
+                      }`}>
                       {formData.status}
                     </span>
                   </div>
@@ -609,7 +609,7 @@ function ModifyPropertyPage() {
               >
                 {isDeleting ? 'Deleting...' : 'Delete Property'}
               </button>
-              
+
               <button
                 onClick={handleSave}
                 disabled={isSaving}

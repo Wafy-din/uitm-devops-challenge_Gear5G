@@ -3,116 +3,133 @@ import ContentWrapper from '@/components/ContentWrapper'
 import SearchBoxProperty from '@/components/SearchBoxProperty'
 import ListFeatured from '@/components/ListFeatured'
 import ListPopularLocation from '@/components/ListPopularLocation'
+import { ArrowRight, Shield, MapPin, Star, UserCheck } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div>
+    <div className="bg-neutral-50 overflow-hidden">
       <ContentWrapper>
-        {/* Hero Section */}
-        <section className="relative min-h-[600px] flex justify-center">
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0">
-            {/* Desktop Hero Image */}
+        {/* Modern Hero Section */}
+        <section className="relative min-h-[85vh] flex flex-col items-center justify-center pt-20 pb-12 px-4 mb-16 overflow-visible">
+
+          {/* Background Elements */}
+          <div className="absolute inset-0 z-0 select-none">
             <Image
-              width={1440}
-              height={600}
+              src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758183708/rentverse-base/hero_bg_desktop_z8j6pg.png"
               alt="Hero Background"
-              className="w-full h-auto bg-top hidden md:block"
-              src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758183708/rentverse-base/hero_bg_desktop_z8j6pg.png" />
-            {/* Mobile Hero Image */}
+              fill
+              className="object-cover object-center hidden md:block"
+              priority
+            />
             <Image
-              width={320}
-              height={600}
+              src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758183708/rentverse-base/hero_bg_mobile_s4xpxr.png"
               alt="Hero Background"
-              className="w-full h-full object-cover md:hidden"
-              src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758183708/rentverse-base/hero_bg_mobile_s4xpxr.png" />
+              fill
+              className="object-cover object-center md:hidden"
+              priority
+            />
+            {/* Gradient Overlay for Text Readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/40 to-neutral-50/90 backdrop-blur-[1px]"></div>
           </div>
 
-          {/* Content Overlay */}
-          <div className="relative z-10 text-center max-w-4xl mx-auto px-4 mt-10">
-            <h1
-              className="mx-auto font-serif text-4xl md:text-5xl lg:text-6xl text-teal-900 mb-4 max-w-2xl leading-tight">
-              The right home is waiting for you
+          {/* Hero Content */}
+          <div className="relative z-10 text-center max-w-5xl mx-auto space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-sm font-semibold shadow-sm animate-fade-in-up">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+              </span>
+              The #1 Rental Platform in Malaysia
+            </div>
+
+            <h1 className="font-serif text-5xl md:text-7xl min-[1400px]:text-8xl text-neutral-900 tracking-tight leading-[1.1] mb-6 animate-fade-in-up delay-100">
+              Find your perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-600 italic">Verse</span> <br />
+              to call home.
             </h1>
-            <p className="text-lg md:text-xl text-teal-700 mb-8 mx-auto max-w-lg">
-              Explore thousands of apartments, condominiums, and houses for rent across the country.
+
+            <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-in-up delay-200">
+              Explore thousands of verified apartments, condominiums, and landed properties.
+              The future of renting is transparent, secure, and purely digital.
             </p>
-            <SearchBoxProperty />
-            <Image
-              src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758186240/rentverse-base/sample-dashboard_h7ez5z.png"
-              alt="Search Results Sample on Rentverse"
-              width={1080}
-              height={720}
-              className="my-20 rounded-lg shadow-lg z-10"
-            />
+
+            <div className="animate-fade-in-up delay-300 w-full max-w-4xl mx-auto px-4 md:px-0">
+              <SearchBoxProperty className="transform transition-transform hover:scale-[1.01]" />
+            </div>
+
+            {/* Trending Tags */}
+            <div className="mt-8 flex flex-wrap justify-center gap-3 animate-fade-in-up delay-500">
+              <span className="text-sm text-neutral-500 font-medium">Trending:</span>
+              {['Mont Kiara', 'Bangsar South', 'KLCC', 'Cyberjaya'].map((loc) => (
+                <Link href={`/property/result?city=${loc}`} key={loc} className="px-3 py-1 bg-white/60 hover:bg-white border border-neutral-200 rounded-full text-xs font-medium text-neutral-600 transition-colors shadow-sm">
+                  {loc}
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
-        {/* Trusted Section */}
-        <section className="py-16 bg-slate-50">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-serif text-slate-800 text-center mb-12">
-              Trusted by Thousands of Tenants and Property Owners
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-              <div className="flex items-center text-start gap-x-4">
-                <Image
-                  src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758187013/rentverse-base/icon-key-property_nkanqy.png"
-                  width={48}
-                  height={48}
-                  alt="Property Owners Icon"
-                  className="w-12 h-12"
-                />
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">10,000+</span>
-                  <p className="text-sm md:text-base text-slate-600">Listed properties</p>
-                </div>
-              </div>
 
-              <div className="flex items-center text-start gap-x-4">
-                <Image
-                  src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758187014/rentverse-base/icon-location_yzbsol.png"
-                  width={48}
-                  height={48}
-                  alt="Location Icon"
-                  className="w-12 h-12"
-                />
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">200+</span>
-                  <p className="text-sm md:text-base text-slate-600">Strategic locations</p>
+        {/* Stats / Trust Section */}
+        <section className="py-20 px-4 relative z-10">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                { icon: Shield, label: 'Verified Owners', value: '10,000+', color: 'text-brand-600', bg: 'bg-brand-50' },
+                { icon: MapPin, label: 'Prime Locations', value: '200+', color: 'text-accent-600', bg: 'bg-accent-50' },
+                { icon: Star, label: 'Satisfaction', value: '4.9/5', color: 'text-amber-500', bg: 'bg-amber-50' },
+                { icon: UserCheck, label: 'Active Tenants', value: '50k+', color: 'text-blue-500', bg: 'bg-blue-50' }
+              ].map((stat, idx) => (
+                <div key={idx} className="glass p-6 rounded-2xl border border-white/50 shadow-sm hover:shadow-md transition-all flex items-center gap-4 group">
+                  <div className={`p-4 rounded-xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
+                    <stat.icon size={28} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-neutral-900 tracking-tight">{stat.value}</h3>
+                    <p className="text-sm text-neutral-500 font-medium">{stat.label}</p>
+                  </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-              <div className="flex items-center text-start gap-x-4">
+        {/* Dashboard Preview Section */}
+        <section className="py-24 px-4 bg-white relative overflow-hidden">
+          {/* Decorative blurred blobs */}
+          <div className="absolute top-0 left-0 w-96 h-96 bg-brand-100 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 opacity-60"></div>
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent-100 rounded-full blur-[120px] translate-x-1/3 translate-y-1/3 opacity-60"></div>
+
+          <div className="max-w-6xl mx-auto relative z-10">
+            <div className="text-center mb-16 max-w-3xl mx-auto">
+              <h2 className="font-serif text-4xl md:text-5xl text-neutral-900 mb-6">Manage rentals with clarity</h2>
+              <p className="text-lg text-neutral-600">
+                From digital agreements to automated rent collection, RentVerse empowers you with a complete suite of tools.
+              </p>
+            </div>
+
+            <div className="relative group">
+              {/* Glow effect behind dashboard */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-neutral-200/50 bg-neutral-900">
                 <Image
-                  src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758187014/rentverse-base/icon-rating_nazm4g.png"
-                  width={48}
-                  height={48}
-                  alt="Rating Icon"
-                  className="w-12 h-12"
+                  src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758186240/rentverse-base/sample-dashboard_h7ez5z.png"
+                  alt="Rentverse Dashboard Interface"
+                  width={1200}
+                  height={800}
+                  className="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity"
                 />
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">98%</span>
-                  <p className="text-sm md:text-base text-slate-600">User satisfaction rate</p>
-                </div>
-              </div>
-              <div className="flex items-center text-start gap-x-4">
-                <Image
-                  src="https://res.cloudinary.com/dqhuvu22u/image/upload/f_webp/v1758187014/rentverse-base/icon-check_poswwx.png"
-                  width={48}
-                  height={48}
-                  alt="Badge Icon"
-                  className="w-12 h-12"
-                />
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">5,000+</span>
-                  <p className="text-sm md:text-base text-slate-600">Verified users</p>
-                </div>
               </div>
             </div>
           </div>
         </section>
-        <ListFeatured />
-        <ListPopularLocation />
+
+        {/* Lists */}
+        <div className="bg-neutral-50 pb-20">
+          <ListFeatured />
+          <ListPopularLocation />
+        </div>
+
       </ContentWrapper>
     </div>
   )

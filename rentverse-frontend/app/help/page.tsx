@@ -131,7 +131,7 @@ export default function HelpPage() {
         <div className="mt-12 p-8 bg-teal-50 rounded-xl border border-teal-200 text-center">
           <h3 className="text-xl font-semibold text-slate-900 mb-2">Still need help?</h3>
           <p className="text-slate-700 mb-4">
-            Can't find what you're looking for? Our support team is here to help.
+            Can&apos;t find what you&apos;re looking for? Our support team is here to help.
           </p>
           <a
             href="/contact"

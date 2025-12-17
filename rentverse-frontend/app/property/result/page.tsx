@@ -28,7 +28,7 @@ function ResultsPageContent() {
     console.log('[ResultsPage] URL params - city:', city, 'type:', type)
     
     // Build filters from URL params
-    const filters: any = {
+    const filters: Record<string, unknown> = {
       page: 1,
       limit: 10,
     }

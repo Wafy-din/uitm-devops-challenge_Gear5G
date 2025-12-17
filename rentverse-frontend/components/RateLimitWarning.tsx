@@ -79,7 +79,7 @@ export default function RateLimitWarning({
           'text-sm mb-3',
           isCritical ? 'text-red-800' : 'text-yellow-800'
         )}>
-          You've made <strong>{currentRequests}</strong> of <strong>{maxRequests}</strong> allowed requests in the last {windowMinutes} minutes.
+          You&apos;ve made <strong>{currentRequests}</strong> of <strong>{maxRequests}</strong> allowed requests in the last {windowMinutes} minutes.
           {isCritical && ' Further requests may be blocked temporarily.'}
         </p>
 

@@ -1,5 +1,7 @@
-export function detectAnomalies(logs: any[]): any[] {
-  const anomalies: any[] = []
+import type { SecurityLog } from '@/types/security'
+
+export function detectAnomalies(logs: SecurityLog[]): Record<string, unknown>[] {
+  const anomalies: Record<string, unknown>[] = []
 
   const recentLogs = logs.filter(log => {
     const logTime = new Date(log.timestamp).getTime()
@@ -69,7 +71,7 @@ export function detectAnomalies(logs: any[]): any[] {
   return anomalies
 }
 
-export function calculateRiskScore(log: any): number {
+export function calculateRiskScore(log: SecurityLog): number {
   let score = 0
 
   if (log.status === 'failed') score += 30
@@ -94,6 +96,15 @@ export function calculateRiskScore(log: any): number {
   return Math.min(100, score)
 }
 
-export function shouldTriggerAlert(anomaly: any): boolean {
+interface Anomaly {
+  type: string
+  severity: string
+  message: string
+  ipAddress?: string
+  userId?: string
+  [key: string]: unknown
+}
+
+export function shouldTriggerAlert(anomaly: Anomaly): boolean {
   return anomaly.severity === 'critical' || anomaly.severity === 'high'
 }

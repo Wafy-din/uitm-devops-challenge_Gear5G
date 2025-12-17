@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation'
 import ContentWrapper from '@/components/ContentWrapper'
 import useAuthStore from '@/stores/authStore'
 import toast from 'react-hot-toast'
-import { 
-  Bell, 
-  Mail, 
-  MessageSquare, 
-  Globe, 
-  Moon, 
-  Sun, 
-  Shield, 
-  Eye, 
-  EyeOff, 
+import {
+  Bell,
+  Mail,
+  MessageSquare,
+  Globe,
+  Moon,
+  Sun,
+  Shield,
+  Eye,
+  EyeOff,
   Loader2,
   Check,
   ChevronRight
@@ -23,7 +23,7 @@ import {
 export default function SettingsPage() {
   const router = useRouter()
   const { user, isLoggedIn, isLoading: authLoading, logout } = useAuthStore()
-  
+
   const [isSaving, setIsSaving] = useState(false)
   const [settings, setSettings] = useState({
     emailNotifications: true,
@@ -91,7 +91,37 @@ export default function SettingsPage() {
     )
     if (!doubleConfirm) return
 
-    toast.error('Account deletion is currently disabled. Please contact support.')
+    const toastId = toast.loading('Deleting account...')
+
+    try {
+      const token = localStorage.getItem('authToken')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete account')
+      }
+
+      toast.dismiss(toastId)
+      toast.success('Account deleted successfully')
+
+      // Clear auth state and redirect
+      logout()
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('user')
+      router.push('/')
+
+    } catch (error: any) {
+      toast.dismiss(toastId)
+      toast.error(error.message || 'Something went wrong')
+      console.error('Delete account error:', error)
+    }
   }
 
   if (authLoading || !user) {
@@ -194,11 +224,10 @@ export default function SettingsPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => handleSelect('profileVisibility', 'public')}
-                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${
-                    settings.profileVisibility === 'public'
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${settings.profileVisibility === 'public'
                       ? 'border-teal-600 bg-teal-50'
                       : 'border-slate-200 hover:border-slate-300'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="text-left">
@@ -212,11 +241,10 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={() => handleSelect('profileVisibility', 'private')}
-                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${
-                    settings.profileVisibility === 'private'
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${settings.profileVisibility === 'private'
                       ? 'border-teal-600 bg-teal-50'
                       : 'border-slate-200 hover:border-slate-300'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="text-left">
@@ -292,9 +320,8 @@ export default function SettingsPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => handleSelect('theme', 'light')}
-                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${
-                    settings.theme === 'light' ? 'border-teal-600 bg-teal-50' : 'border-slate-200'
-                  }`}
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${settings.theme === 'light' ? 'border-teal-600 bg-teal-50' : 'border-slate-200'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -306,9 +333,8 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={() => handleSelect('theme', 'dark')}
-                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${
-                    settings.theme === 'dark' ? 'border-teal-600 bg-teal-50' : 'border-slate-200'
-                  }`}
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 transition-colors ${settings.theme === 'dark' ? 'border-teal-600 bg-teal-50' : 'border-slate-200'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -390,14 +416,12 @@ function SettingToggle({ icon, label, description, checked, onChange, small = fa
       </div>
       <button
         onClick={onChange}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-          checked ? 'bg-teal-600' : 'bg-slate-300'
-        }`}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${checked ? 'bg-teal-600' : 'bg-slate-300'
+          }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-6' : 'translate-x-1'
-          }`}
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'
+            }`}
         />
       </button>
     </div>

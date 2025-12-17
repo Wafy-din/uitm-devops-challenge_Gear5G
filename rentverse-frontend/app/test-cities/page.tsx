@@ -15,7 +15,11 @@ export default function TestCitiesPage() {
         const data = await response.json()
         
         if (data.success && data.data.properties) {
-          const uniqueCities = [...new Set(data.data.properties.map((p: any) => p.city))]
+          interface Property {
+            city: string
+            [key: string]: unknown
+          }
+          const uniqueCities = [...new Set(data.data.properties.map((p: Property) => p.city))]
             .filter(Boolean)
             .sort()
           

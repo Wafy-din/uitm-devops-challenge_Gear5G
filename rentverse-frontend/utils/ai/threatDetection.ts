@@ -1,4 +1,6 @@
-interface ThreatPattern {
+import type { SecurityLog } from '@/types/security'
+
+export interface ThreatPattern {
   type: string
   indicators: string[]
   severity: 'low' | 'medium' | 'high' | 'critical'
@@ -13,7 +15,7 @@ interface UserBehavior {
   devices: string[]
 }
 
-export function analyzeThreatPatterns(logs: any[]): ThreatPattern[] {
+export function analyzeThreatPatterns(logs: SecurityLog[]): ThreatPattern[] {
   const threats: ThreatPattern[] = []
 
   const bruteForceAttacks = detectBruteForce(logs)
@@ -59,10 +61,16 @@ export function analyzeThreatPatterns(logs: any[]): ThreatPattern[] {
   return threats
 }
 
-function detectBruteForce(logs: any[]): string[] {
+function getUserLabel(log: SecurityLog): string {
+  if (log.userName && log.userName.trim().length > 0) return `${log.userName} (${log.userEmail || ''})`
+  if (log.userEmail && log.userEmail !== 'Unknown') return log.userEmail
+  return `User ${log.userId.substring(0, 8)}...`
+}
+
+function detectBruteForce(logs: SecurityLog[]): string[] {
   const indicators: string[] = []
   const recentLogs = logs.filter(l => Date.now() - new Date(l.timestamp).getTime() < 300000)
-  
+
   const ipAttempts = new Map<string, number>()
   recentLogs.forEach(log => {
     if (log.action === 'login' && log.status === 'failed') {
@@ -79,14 +87,15 @@ function detectBruteForce(logs: any[]): string[] {
   return indicators
 }
 
-function detectAccountTakeover(logs: any[]): string[] {
+function detectAccountTakeover(logs: SecurityLog[]): string[] {
   const indicators: string[] = []
-  const userBehaviors = new Map<string, UserBehavior>()
+  const userBehaviors = new Map<string, UserBehavior & { label: string }>()
 
   logs.forEach(log => {
     if (!userBehaviors.has(log.userId)) {
       userBehaviors.set(log.userId, {
         userId: log.userId,
+        label: getUserLabel(log),
         actions: [],
         timestamps: [],
         locations: [],
@@ -99,6 +108,11 @@ function detectAccountTakeover(logs: any[]): string[] {
     behavior.timestamps.push(new Date(log.timestamp).getTime())
     if (log.location) behavior.locations.push(log.location)
     if (log.deviceInfo) behavior.devices.push(log.deviceInfo)
+
+    // Update label if we get better info later in the stream
+    if (!behavior.label.includes('@') && log.userEmail) {
+      behavior.label = getUserLabel(log)
+    }
   })
 
   userBehaviors.forEach((behavior, userId) => {
@@ -108,14 +122,14 @@ function detectAccountTakeover(logs: any[]): string[] {
     if (uniqueLocations.size > 3 && behavior.timestamps.length > 0) {
       const timeRange = Math.max(...behavior.timestamps) - Math.min(...behavior.timestamps)
       if (timeRange < 3600000) {
-        indicators.push(`User ${userId}: ${uniqueLocations.size} locations in 1 hour (impossible travel)`)
+        indicators.push(`${behavior.label}: ${uniqueLocations.size} locations in 1 hour (impossible travel)`)
       }
     }
 
     if (uniqueDevices.size > 2 && behavior.timestamps.length > 0) {
       const timeRange = Math.max(...behavior.timestamps) - Math.min(...behavior.timestamps)
       if (timeRange < 1800000) {
-        indicators.push(`User ${userId}: ${uniqueDevices.size} devices in 30 minutes`)
+        indicators.push(`${behavior.label}: ${uniqueDevices.size} devices in 30 minutes`)
       }
     }
   })
@@ -123,41 +137,43 @@ function detectAccountTakeover(logs: any[]): string[] {
   return indicators
 }
 
-function detectDataExfiltration(logs: any[]): string[] {
+function detectDataExfiltration(logs: SecurityLog[]): string[] {
   const indicators: string[] = []
-  
-  const dataAccessCounts = new Map<string, number>()
+
+  const userActivity = new Map<string, { count: number, label: string }>()
   logs.forEach(log => {
     if (log.action.includes('data_access') || log.action.includes('export')) {
-      dataAccessCounts.set(log.userId, (dataAccessCounts.get(log.userId) || 0) + 1)
+      const current = userActivity.get(log.userId) || { count: 0, label: getUserLabel(log) }
+      userActivity.set(log.userId, { count: current.count + 1, label: current.label })
     }
   })
 
-  dataAccessCounts.forEach((count, userId) => {
-    if (count > 20) {
-      indicators.push(`User ${userId}: ${count} data access operations (potential exfiltration)`)
+  userActivity.forEach((data, userId) => {
+    if (data.count > 20) {
+      indicators.push(`${data.label}: ${data.count} data access operations (potential exfiltration)`)
     }
   })
 
   return indicators
 }
 
-function detectAbnormalAccess(logs: any[]): string[] {
+function detectAbnormalAccess(logs: SecurityLog[]): string[] {
   const indicators: string[] = []
-  
+
   const nightAccess = logs.filter(log => {
     const hour = new Date(log.timestamp).getHours()
     return hour >= 0 && hour < 6
   })
 
-  const userNightAccess = new Map<string, number>()
+  const userNightAccess = new Map<string, { count: number, label: string }>()
   nightAccess.forEach(log => {
-    userNightAccess.set(log.userId, (userNightAccess.get(log.userId) || 0) + 1)
+    const current = userNightAccess.get(log.userId) || { count: 0, label: getUserLabel(log) }
+    userNightAccess.set(log.userId, { count: current.count + 1, label: current.label })
   })
 
-  userNightAccess.forEach((count, userId) => {
-    if (count > 5) {
-      indicators.push(`User ${userId}: ${count} access attempts during night hours (00:00-06:00)`)
+  userNightAccess.forEach((data, userId) => {
+    if (data.count > 5) {
+      indicators.push(`${data.label}: ${data.count} access attempts during night hours (00:00-06:00)`)
     }
   })
 
@@ -186,7 +202,7 @@ export function calculateThreatScore(patterns: ThreatPattern[]): number {
   return Math.min(100, totalScore / totalWeight)
 }
 
-export function generateThreatReport(logs: any[]) {
+export function generateThreatReport(logs: SecurityLog[]) {
   const patterns = analyzeThreatPatterns(logs)
   const threatScore = calculateThreatScore(patterns)
 

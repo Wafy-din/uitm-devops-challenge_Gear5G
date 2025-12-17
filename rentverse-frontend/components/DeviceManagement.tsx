@@ -218,7 +218,7 @@ export default function DeviceManagement() {
 
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-900">
-          <strong>Security Tip:</strong> Remove any devices you don't recognize. Trusted devices can access your account without additional verification.
+          <strong>Security Tip:</strong> Remove any devices you don&apos;t recognize. Trusted devices can access your account without additional verification.
         </p>
       </div>
     </div>
