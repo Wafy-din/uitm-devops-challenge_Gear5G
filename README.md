@@ -16,8 +16,8 @@ This repository contains the complete implementation for the UiTM Mobile SecOps 
 
 ## � Team Members
 
-| Name | Student ID | Role |
-|------|------------|------|
+| Name | Student ID |
+|------|------------|
 | **MOHAMMAD WAFIUDDIN BIN MOHD NUBLI** | `2024745953` |
 | **MUHAMMAD FAHEEM BIN HASWANORRIZAM** | `2024793085` |
 | **MUHAMMAD AKMAL BIN MOHD RODZAI** | `2024988405` |
