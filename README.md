@@ -58,7 +58,11 @@ cd rentverse-frontend
 npm install
 npm run dev
 ```
+Access the application at `http://localhost:3000`.
 Access the application at `https://gear5g-rentverse.vercel.app`.
+
+> [!NOTE]
+> **Backend Cold Start:** The backend server is hosted on a free-tier instance. If not used for a while, it spins down to save resources. The first request may take up to **50 seconds** to process while the server wakes up. Subsequent requests will be instant.
 
 ### 2. Backend API
 Navigate to `rentverse-backend`:
