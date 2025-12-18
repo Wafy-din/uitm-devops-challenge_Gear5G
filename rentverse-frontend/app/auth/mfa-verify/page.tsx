@@ -149,7 +149,7 @@ export default function MFAVerifyPage() {
             </div>
 
             <button
-              onClick={handleVerifyOTP}
+              onClick={() => handleVerifyOTP()}
               disabled={isLoading || otp.length !== 6}
               className="w-full flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >

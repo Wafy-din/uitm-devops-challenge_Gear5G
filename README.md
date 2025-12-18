@@ -32,6 +32,11 @@ Start here to evaluate our submission:
 4. **[System Architecture](ARCHITECTURE.md)** - Visual diagram and component breakdown.
 5. **[Implementation Roadmap](SECOPS_IMPLEMENTATION_ROADMAP.md)** - Timeline and milestones achieved.
 
+## 🎥 Demo Video
+
+Watch our application in action here:
+**[📂 View Demo Videos (Google Drive)](https://drive.google.com/drive/folders/1-XuuAms0KRANJ9lwmTLdD0PrKyTEjbxG?usp=sharing)**
+
 ## 📁 Repository Structure
 
 ```
@@ -59,6 +64,9 @@ npm install
 npm run dev
 ```
 Access the application at `https://gear5g-rentverse.vercel.app`.
+
+> [!NOTE]
+> **Backend Cold Start:** The backend server is hosted on a free-tier instance. If not used for a while, it spins down to save resources. The first request may take up to **50 seconds** to process while the server wakes up. Subsequent requests will be instant.
 
 ### 2. Backend API
 Navigate to `rentverse-backend`:
