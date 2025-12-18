@@ -63,6 +63,7 @@ cd rentverse-frontend
 npm install
 npm run dev
 ```
+Access the application at local `http://localhost:3000`.
 Access the application at `https://gear5g-rentverse.vercel.app`.
 
 > [!NOTE]
