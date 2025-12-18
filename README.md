@@ -32,6 +32,11 @@ Start here to evaluate our submission:
 4. **[System Architecture](ARCHITECTURE.md)** - Visual diagram and component breakdown.
 5. **[Implementation Roadmap](SECOPS_IMPLEMENTATION_ROADMAP.md)** - Timeline and milestones achieved.
 
+## 🎥 Demo Video
+
+Watch our application in action here:
+**[📂 View Demo Videos (Google Drive)](https://drive.google.com/drive/folders/1-XuuAms0KRANJ9lwmTLdD0PrKyTEjbxG?usp=sharing)**
+
 ## 📁 Repository Structure
 
 ```
@@ -58,7 +63,7 @@ cd rentverse-frontend
 npm install
 npm run dev
 ```
-Access the application at `http://localhost:3000`.
+Access the application at local `http://localhost:3000`.
 Access the application at `https://gear5g-rentverse.vercel.app`.
 
 > [!NOTE]
